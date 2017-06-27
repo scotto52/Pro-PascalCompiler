@@ -30,13 +30,18 @@ public class pascalCompiler {
               "CONST\n"+
               "D = 5:REAL;"+
               "VAR\n"+
-              "A,B,C = 4:REAL;"+
+              "A:BOOLEAN;"+
+              "B:REAL;"+
               "Bigvarname:INTEGER;"+
               " BEGIN \n" +
-              " A := 43 * 33 ; \n" +
-              " B := C * 6 ; \n" +
+              " B := D * 6 ; \n" +
+              " Bigvarname := 1 * 2; "+
+              " IF 43 > 33 AND 4 > 1 THEN \n" +
+              " BEGIN "+
               " Writeln(A) ; \n" +
               " Writeln(B) ; \n" +
+              " END " +
+              " Writeln( Bigvarname) ;"+
               " END ." ;
       BufferedReader in4 = new BufferedReader(new StringReader(sourceCode));
       

@@ -76,6 +76,16 @@ class SimpleParser
         {
             throw new PascalParseError("expected a statement here BOB");
         }
+        if( "BEGIN".equalsIgnoreCase(st.sval))
+        {
+            st.pushBack();
+            return groupStatement(st);
+        }
+        if( "IF".equalsIgnoreCase(st.sval))
+        {
+            st.pushBack();
+            return ifStatement(st);
+        }
         if( "WriteLn".equalsIgnoreCase(st.sval))
         {
             st.pushBack();
@@ -106,7 +116,7 @@ class SimpleParser
             {
                 throw new PascalParseError("EXPECTED := in assignment");
             }
-            TreePart express = expression( st );
+            TreePart express = booleanGroupExpression( st );
             
             token = st.nextToken();
             if(token != ';')
@@ -221,6 +231,39 @@ class SimpleParser
         Statement result = parseProgram( st ) ;//CHAGEN 
         return result ; 
       } 
+      
+      public Statement groupStatement (StreamTokenizer st)
+              throws PascalParseError,IOException
+      {
+          BlockStatement block = new BlockStatement(); assert block != null;
+          int token = st.nextToken();
+          if("BEGIN".equalsIgnoreCase(st.sval)== false)
+          {
+              throw new PascalParseError("Block must begin with word BEGIN");
+          }
+          
+          boolean keepGoing = true;
+          do
+          {
+              Statement s = allStatements(st);
+              block.add(s);
+              token = st.nextToken();
+              if(token != StreamTokenizer.TT_WORD)
+              {
+                  throw new PascalParseError("expected and END here at this block" + token);
+              }
+              if("END".equalsIgnoreCase (st.sval) == true)
+              {
+                  keepGoing = false;
+                  System.out.println("FOUND END");
+              }else
+              {
+                  st.pushBack();
+              }
+                  
+              }while (keepGoing == true);
+          return block;
+      }
       
       public String expressionToJava (BufferedReader in4) throws PascalParseError, IOException
       {
@@ -499,6 +542,133 @@ class SimpleParser
             ProgramStatement prgm = new ProgramStatement(programName, s);
             return prgm;
             
+      }
+      
+      public TreePart booleanExpression(StreamTokenizer st)
+              throws PascalParseError,IOException
+      {
+          TreePart first = expression(st);
+          int token = st.nextToken();
+          if ( (token == '<')|| (token == '>') || (token == '='))
+          { // SURE ITS A COMPARISON
+              System.out.println("It's a comparison "+ token);
+              int secondToken = st.nextToken();
+              if((secondToken == '>') || (secondToken == '='))
+              {
+                  int thing = -1;
+                  if( (token == '<') && (secondToken == '>'))
+                  {
+                      thing = BooleanExpTreePart.NOT_EQUAL;
+                  }
+                  if( (token == '>') && (secondToken == '='))
+                  {
+                      thing = BooleanExpTreePart.GREATER_OR_EQUAL;
+                  }
+                  if( (token == '<') && (secondToken == '='))
+                  {
+                      thing = BooleanExpTreePart.LESSTHAN_OR_EQUAL;
+                  }
+                  if(thing == -1)
+                  {
+                      throw new PascalParseError("started a comparison with "+
+                              token + " Didn't figure it out");
+                  }
+                  TreePart secondPart = expression(st);
+                  BooleanExpTreePart bx = new BooleanExpTreePart(first,thing,secondPart);
+                  return bx;
+                      }
+              else
+              {
+                  st.pushBack();// save the next token for later.
+                  int thing = -1;
+                  if(token == '<')
+                  {
+                      thing = BooleanExpTreePart.LESS_THAN;
+                  }
+                  if(token == '>')
+                  {
+                      thing = BooleanExpTreePart.GREATER_THAN;
+                  }
+                  if(token == '=')
+                  {
+                      thing = BooleanExpTreePart.EQUAL_TO;
+                  }
+                  TreePart secondPart = expression(st);
+                  BooleanExpTreePart bx = new BooleanExpTreePart(first, thing, secondPart);
+                  return bx;
+              }
+              
+          }else
+          {
+              st.pushBack();
+          }
+          return first;
+      }
+      
+      public TreePart booleanGroupExpression ( StreamTokenizer st)
+              throws PascalParseError,IOException
+      {
+          // 1. TEST IF NOT (EXPRESSION)
+          int token = st.nextToken();
+          if(token == StreamTokenizer.TT_WORD && "NOT".equalsIgnoreCase(st.sval))
+          {
+              TreePart secondPart = booleanExpression(st);
+              BooleanExpTreePart bx = new BooleanExpTreePart(secondPart,BooleanExpTreePart.NOT, null);
+              return bx;
+          }else
+          {
+              st.pushBack(); // Pretend nothing ever happened
+          }
+          TreePart first = booleanExpression(st);
+          token = st.nextToken();
+          //2. TEST FOR EXPRESSION AND EXPRESSION
+          if(token == StreamTokenizer.TT_WORD)
+          {
+              if( "AND".equalsIgnoreCase(st.sval))
+              {
+                  TreePart secondPart = booleanExpression(st);
+                  BooleanExpTreePart bx = new BooleanExpTreePart(first, BooleanExpTreePart.AND,
+                  secondPart);
+                  return bx;
+              }
+              //3. TEST FOR EXPRESSION OR EXPRESSION
+              if("OR".equalsIgnoreCase(st.sval))
+              {
+                  TreePart secondPart = booleanExpression(st);
+                  BooleanExpTreePart bx = new BooleanExpTreePart(first, BooleanExpTreePart.OR,
+                  secondPart);
+                  return bx;
+              }
+              st.pushBack(); // wasn't AND or OR
+          }else st.pushBack(); //wasn't something I like to think about
+          return first;
+      }
+      
+      public Statement ifStatement(StreamTokenizer st)
+              throws PascalParseError,IOException
+      {
+          int token = st.nextToken();
+          if(token != StreamTokenizer.TT_WORD ||
+                  "IF".equalsIgnoreCase(st.sval)==false)
+          {
+              throw new PascalParseError("Expected IF");
+          }
+          TreePart expression = booleanGroupExpression(st);
+          System.out.println("READ-IN-IF-STATEMENT-THEN");
+          token = st.nextToken();
+          if(token != StreamTokenizer.TT_WORD ||
+                  "THEN".equalsIgnoreCase(st.sval)== false)
+          {
+              throw new PascalParseError("Expected THEN here");
+          }
+          System.out.println("READ-IN-IF-STATEMENT '"+ st.sval);
+          Statement block = allStatements(st);
+          // NOTICE NO ending ';'
+          
+          IfTreeStatement ifState = new IfTreeStatement(expression, block);
+                  return ifState;
+          
+          
       }
 } // END CLASS 
  
