@@ -86,6 +86,11 @@ class SimpleParser
             st.pushBack();
             return ifStatement(st);
         }
+        if( "WHILE".equalsIgnoreCase(st.sval))
+        {
+            st.pushBack();
+            return whileStatement(st);
+        }
         if( "WriteLn".equalsIgnoreCase(st.sval))
         {
             st.pushBack();
@@ -669,6 +674,30 @@ class SimpleParser
                   return ifState;
           
           
+      }
+      
+      public Statement whileStatement(StreamTokenizer st)
+              throws PascalParseError,IOException
+      {
+          int token = st.nextToken();
+          if(token != StreamTokenizer.TT_WORD ||
+                  "WHILE".equalsIgnoreCase(st.sval)==false)
+          {
+              throw new PascalParseError("Expected WHILE here");
+          }
+          TreePart expression = booleanGroupExpression(st);
+          System.out.println("READ-IN-WHILE-STATEMENT-DO");
+          token = st.nextToken();
+          if(token != StreamTokenizer.TT_WORD ||
+                  "DO".equalsIgnoreCase(st.sval) == false)
+          {
+              throw new PascalParseError("Expected DO here");
+          }
+          System.out.println("READ-IN-WHILE-STATEMENT '"+ st.sval);
+          Statement block = allStatements(st);
+          
+          WhileTreeStatement whileState = new WhileTreeStatement(expression, block);
+          return whileState;
       }
 } // END CLASS 
  
