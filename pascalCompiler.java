@@ -28,7 +28,7 @@ public class pascalCompiler {
       String sourceCode = 
               "PROGRAM HelloWorld ; \n"+
               "CONST\n"+
-              "D = 5:REAL;"+
+              "D = 5;"+
               "VAR\n"+
               " A:BOOLEAN;"+
               " B:REAL;"+
@@ -36,11 +36,10 @@ public class pascalCompiler {
               " BEGIN \n" +
               " B := D * 6 ; \n" +
               " Bigvarname := 1; "+
-              " WHILE Bigvarname < 10 DO \n" +
-              " BEGIN "+
+              " REPEAT \n "+
               "     Writeln(Bigvarname) ; \n" +
               "     Bigvarname : = Bigvarname +1 ; \n" +
-              " END " +
+              " UNTIL Bigvarname > 10; " +
               " Writeln( Bigvarname) ;"+
               "END ." ;
       BufferedReader in4 = new BufferedReader(new StringReader(sourceCode));

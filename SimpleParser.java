@@ -10,7 +10,8 @@ import java.util.*;
 
 class SimpleParser
 { 
-  HashMap<String,VariablePart> symbolTable = new HashMap<String,VariablePart>(); 
+  HashMap<String,VariablePart> symbolTable = new HashMap<String,VariablePart>();
+  HashMap<String,ConstantPart> cSymbolTable = new HashMap<String,ConstantPart>();
   
   
   //-----------------------------------------------------------------------
@@ -90,6 +91,11 @@ class SimpleParser
         {
             st.pushBack();
             return whileStatement(st);
+        }
+        if( "REPEAT".equalsIgnoreCase(st.sval))
+        {
+            st.pushBack();
+            return repeatStatement(st);
         }
         if( "WriteLn".equalsIgnoreCase(st.sval))
         {
@@ -211,6 +217,18 @@ class SimpleParser
       st.pushBack();  // Leave it for somone. else  
       return first; // nothing else to 
     } 
+    
+      ConstantPart makeConstant(String name)
+      {
+          name = name.toLowerCase();
+          ConstantPart con = cSymbolTable.get(name);
+          if(con == null)
+          {
+              con = new ConstantPart(name);
+              cSymbolTable.put(name, con);
+          }
+          return con;
+      }
       //----------------------------------------------------------
       VariablePart makeVariable(String name  )
       {  
@@ -296,20 +314,31 @@ class SimpleParser
           if(token != StreamTokenizer.TT_WORD)
           {
               throw new PascalParseError(
-              "expected a Constant Name here" + token);
+              "expected a Constant Name here got" + token);
           }
           if ("BEGIN".equalsIgnoreCase(st.sval) == true)
           {
               st.pushBack();
               return ;
           }
-          
           ConstantPart c = new ConstantPart(st.sval);
           ArrayList<ConstantPart> px = new ArrayList<ConstantPart>();
           px.add(c);
-          if(block.addConstant(c)== false)
+          st.pushBack();
+          do
           {
-              throw new PascalParseError("Duplicate Constant name "+st.sval);
+              //PARSE CONSTANT NAME
+              token = st.nextToken();
+              if(token != StreamTokenizer.TT_WORD)
+              {
+                  throw new PascalParseError("expected a Constant Name here");
+              }
+              System.out.println("Found "+ st.sval);
+              c = new ConstantPart(st.sval);
+              px.add(c);
+              if(block.addConstant(c)== false)
+              {
+                throw new PascalParseError("Duplicate Constant name "+st.sval);
               }
               // PARSE '='
               token = st.nextToken();
@@ -318,38 +347,26 @@ class SimpleParser
                   throw new PascalParseError("expected an equals '=' here");
               }
               token = st.nextToken();
-              System.out.println("= so READ number ");
-              if(token == StreamTokenizer.TT_NUMBER )
+              System.out.println("READ Constant Value");
+              if(token == StreamTokenizer.TT_NUMBER)
               {
-                  System.out.println( " NUMBER " + st.nval);
+                  System.out.println("NUMBER " + st.nval);
                   c.setValue(st.nval);
                   token = st.nextToken();
               }else
               {
-                  throw new PascalParseError("Expected a number ");
+                  throw new PascalParseError("Expected valid Constant Type");
               }
-              // PARSE ':' to end list
-              if(!(token == ':'))
               {
-                  throw new PascalParseError("expected a ':' here");
-          } while (token != ':');
-
-              token = st.nextToken();
-              if (token != StreamTokenizer.TT_WORD)
-              {
-                  throw new PascalParseError("expected a Constant Type here ");
+                  
               }
-              // This time
-              ConstantType type = ConstantType.getEnumerationForString(st.sval);
-              for(ConstantPart theConst : px)
-              {
-                  theConst.setConstant(type);
-              }
-              token = st.nextToken();
-              if(token != ';')
+              if(!(token == ';'))
               {
                   throw new PascalParseError("expected semi colon here ");
               }
+              // PARSE ':' to end list
+          } while (token != ';');
+
               token = st.nextToken();
               if(token != StreamTokenizer.TT_WORD)
               {
@@ -357,13 +374,13 @@ class SimpleParser
               }
               theNext = new String(st.sval);
               st.pushBack();
-          } while(theNext.equalsIgnoreCase("VAR") == false);
+          }while(theNext.equalsIgnoreCase("VAR") == false);
               System.out.println("FINISHED CONSTS");
+          }  
               
               
               
-              
-          }
+          
       
       
       public void parseVars( StreamTokenizer st, BlockStatement block)
@@ -406,20 +423,6 @@ class SimpleParser
                   throw new PascalParseError("Duplicate Variable name "+ st.sval);
               }
               token = st.nextToken();
-              if( token == '=') // handle deafult value
-              {
-                  token = st.nextToken();
-                  System.out.println("= so READ number");
-                  if(token == StreamTokenizer.TT_NUMBER)
-                  {
-                      System.out.println(" NUMBER " + st.nval);
-                      t.setDefaultValue(st.nval);
-                      token = st.nextToken();
-                  }else
-                  {
-                      throw new PascalParseError("Expected a number ");
-                  }
-              }
               // PARSE ',' or ':' to end list
               if(! (token == ':' || token == ',' ))
               {
@@ -429,7 +432,6 @@ class SimpleParser
           }while(token != ':');
           
           token = st.nextToken();
-          // PARSE NAME OF VARIABLE MUST BE 'REAL'
           if(token != StreamTokenizer.TT_WORD)
           {
               throw new PascalParseError("expected a Variable Type here ");
@@ -699,6 +701,47 @@ class SimpleParser
           WhileTreeStatement whileState = new WhileTreeStatement(expression, block);
           return whileState;
       }
+      
+      public Statement repeatStatement(StreamTokenizer st)
+              throws PascalParseError, IOException
+      {
+          int token = st.nextToken();
+          if (token != StreamTokenizer.TT_WORD ||
+                  "REPEAT".equalsIgnoreCase(st.sval) == false)
+          {
+              throw new PascalParseError("Expected REPEAT");
+          }
+          BlockStatement block = new BlockStatement(); assert block != null;
+          boolean keepGoing = true;
+          do
+          {
+              Statement s = allStatements(st);
+              block.add(s);
+              token = st.nextToken();
+              if(token != StreamTokenizer.TT_WORD)
+              {
+                  throw new PascalParseError("expected and UNTIL here at this block" + token);
+              }
+              if("UNTIL".equalsIgnoreCase (st.sval) == true)
+              {
+                  keepGoing = false;
+                  System.out.println("FOUND UNTIL");
+              }else
+              {
+                  st.pushBack();
+              }
+                  
+              }while (keepGoing == true);
+              TreePart expression = booleanGroupExpression(st);
+              token = st.nextToken();
+              if(token != ';')
+            {
+                throw new PascalParseError(" expected semi colon here ");
+            }
+            RepeatStatement repeatState = new RepeatStatement(block, expression);
+            return repeatState;
+              
+          }
 } // END CLASS 
  
 
