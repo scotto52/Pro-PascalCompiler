@@ -35,6 +35,10 @@ public class pascalCompiler {
               " Bigvarname:INTEGER;"+
               " BEGIN \n" +
               " B := D * 6 ; \n" +
+              " IF 43 > 33 AND 4 > 1 THEN \n"+
+              "     Writeln( A ) ; \n"+
+              " ELSE \n"+
+              "     Writeln( B ) ; \n"+
               " Bigvarname := 1; "+
               " REPEAT \n "+
               "     Writeln(Bigvarname) ; \n" +

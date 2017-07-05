@@ -670,10 +670,20 @@ class SimpleParser
           }
           System.out.println("READ-IN-IF-STATEMENT '"+ st.sval);
           Statement block = allStatements(st);
+          //System.out.println("READ-GOT-THIS-FAR");
+          token = st.nextToken();
+          if(token != StreamTokenizer.TT_WORD ||
+                  "ELSE".equalsIgnoreCase(st.sval)== false)
+          {
+              st.pushBack();
+              IfTreeStatement ifState = new IfTreeStatement(expression, block);
+              return ifState;
+          }
+          System.out.println ("READ-IN-IF-STATEMENT-ELSE '" + st.sval);
+          Statement eblock = allStatements(st);
+          IfTreeStatement ifState = new IfTreeStatement(expression, block, eblock);
           // NOTICE NO ending ';'
-          
-          IfTreeStatement ifState = new IfTreeStatement(expression, block);
-                  return ifState;
+          return ifState;
           
           
       }

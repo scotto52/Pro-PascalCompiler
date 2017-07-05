@@ -12,15 +12,29 @@ package chapter2;
 public class IfTreeStatement extends Statement {
     TreePart expression;
     Statement block;
+    Statement eblock; //block to hold ELSE statements
     
     public IfTreeStatement(TreePart ex, Statement blk)
     {
         this.expression = ex;
         this.block = blk;
     }
+    public IfTreeStatement(TreePart ex, Statement blk, Statement eblk)
+    {
+        this.expression = ex;
+        this.block = blk;
+        this.eblock = eblk;
+    }
     @Override public String toJavaCode()
     {
-        return "if("+ expression.toJavaCode() + ") \n { \n " +
+        String result = "if("+ expression.toJavaCode() + ") \n { \n " +
                 block.toJavaCode() + " \n} ";
+        if(eblock != null)
+        {
+            result = result + "else \n { \n " +
+                    eblock.toJavaCode() + " \n} ";
+        }
+        return result;
+            
     }
 }
