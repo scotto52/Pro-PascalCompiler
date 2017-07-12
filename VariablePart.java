@@ -37,6 +37,10 @@ package chapter2;
    {
        return variablename;
    }
+   public VariableType getVariableType()
+   {
+       return whichPrimativeType;
+   }
    public void setVariable(VariableType whichType)
    {
        this.whichPrimativeType = whichType;

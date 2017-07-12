@@ -34,15 +34,7 @@ public class BlockStatement extends Statement
     public String toJavaCode()
     {
         StringBuffer b = new StringBuffer("{ // BEGIN \n");
-        // NOW PUT CONSTANTS HERE
-        b.append("// CONSTS \n");
-        for(String con : blockConstantTable.keySet())
-        {
-            ConstantPart t = blockConstantTable.get(con);
-            b.append(t.getDefinitionString());
-        }
-        
-        // NOW PUT LOCAL VARS HERE
+        // NOW PUT VARS HERE
         b.append("// VARS \n");
         for(String var : blockSymbolTable.keySet())
         {
@@ -72,7 +64,7 @@ public class BlockStatement extends Statement
         return result;
     }
     
-    public boolean addConstant(ConstantPart it)
+    /*public boolean addConstant(ConstantPart it)
     {
         boolean result = true;
         ConstantPart already = blockConstantTable.get(it.getConstantName());
@@ -83,6 +75,6 @@ public class BlockStatement extends Statement
         }
         blockConstantTable.put(it.getConstantName(), it );
         return result;
-    }
+    }*/
     
 }

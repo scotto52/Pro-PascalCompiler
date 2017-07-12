@@ -9,25 +9,27 @@ package chapter2;
  *
  * @author Robertson
  */
-public class ConstantPart extends TreePart {
-   String constantname ; // For now will change later.
-   double value;
+public class ConstantPart extends VariablePart {
+   //String constantname ; // For now will change later.
+   //double value;
    
    public ConstantPart( String theName ) 
      { 
-        constantname  = theName.toLowerCase() ;
-        value = 0;
+        //constantname  = theName.toLowerCase() ;
+        //value = 0;
+         super(theName);
      } 
    
-   public String toJavaCode()
+   /** public String toJavaCode()
    { 
        return  "(CONST) "+constantname  ; 
-   } 
+   } */
    public String getDefinitionString()
    {
-       return constantname + " = " + value + ";\n";
+       return "(CONST) " + VariableType.getJavaStringFor(whichPrimativeType) + 
+               " " + variablename + " = " + defaultValue + ";\n";
    }
-   public String getConstantName()
+   /** public String getConstantName()
    {
        return constantname;
    }
@@ -35,5 +37,5 @@ public class ConstantPart extends TreePart {
    public void setValue(double d)
    {
        value = d;
-   }
+   } */
 }

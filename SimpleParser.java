@@ -218,17 +218,6 @@ class SimpleParser
       return first; // nothing else to 
     } 
     
-      ConstantPart makeConstant(String name)
-      {
-          name = name.toLowerCase();
-          ConstantPart con = cSymbolTable.get(name);
-          if(con == null)
-          {
-              con = new ConstantPart(name);
-              cSymbolTable.put(name, con);
-          }
-          return con;
-      }
       //----------------------------------------------------------
       VariablePart makeVariable(String name  )
       {  
@@ -306,37 +295,33 @@ class SimpleParser
               throws PascalParseError,IOException
       {
           // do rows
-          String theNext = "";
-          do
-          {
+          //String theNext = "";
+          //do
+          //{
           // PARSE OPTION BEGIN
-          int token = st.nextToken();
-          if(token != StreamTokenizer.TT_WORD)
+          int token;
+          ConstantPart c = null;
+          boolean keepGoing = true;
+          // ASSUME CONST EXIST UNTIL WE FIND TYPE, VAR or BEGIN
+          while(keepGoing == true)
           {
-              throw new PascalParseError(
-              "expected a Constant Name here got" + token);
-          }
-          if ("BEGIN".equalsIgnoreCase(st.sval) == true)
-          {
+              token = st.nextToken();
+            if("TYPE".equalsIgnoreCase(st.sval) == true ||
+                    "VAR".equalsIgnoreCase(st.sval) == true ||
+                            "BEGIN".equalsIgnoreCase(st.sval) == true)
+                      { // this is OK const may not exist
               st.pushBack();
+              keepGoing = false;
               return ;
           }
-          ConstantPart c = new ConstantPart(st.sval);
-          ArrayList<ConstantPart> px = new ArrayList<ConstantPart>();
-          px.add(c);
-          st.pushBack();
-          do
-          {
               //PARSE CONSTANT NAME
-              token = st.nextToken();
               if(token != StreamTokenizer.TT_WORD)
               {
                   throw new PascalParseError("expected a Constant Name here");
               }
-              System.out.println("Found "+ st.sval);
+              System.out.println("Found constant "+ st.sval);
               c = new ConstantPart(st.sval);
-              px.add(c);
-              if(block.addConstant(c)== false)
+              if(block.addVariable(c)== false)
               {
                 throw new PascalParseError("Duplicate Constant name "+st.sval);
               }
@@ -351,38 +336,22 @@ class SimpleParser
               if(token == StreamTokenizer.TT_NUMBER)
               {
                   System.out.println("NUMBER " + st.nval);
-                  c.setValue(st.nval);
+                  c.setDefaultValue(st.nval);
                   token = st.nextToken();
-              }else
+              }else 
               {
+                  // ToDo handle strings and characters and other types
                   throw new PascalParseError("Expected valid Constant Type");
               }
+              if (! (token == ';') )
               {
-                  
+                  throw new PascalParseError("expected a comma ',' or ':' ");
               }
-              if(!(token == ';'))
-              {
-                  throw new PascalParseError("expected semi colon here ");
-              }
-              // PARSE ':' to end list
-          } while (token != ';');
-
-              token = st.nextToken();
-              if(token != StreamTokenizer.TT_WORD)
-              {
-                  throw new PascalParseError("expected BEGIN/VARIABLE name here ");
-              }
-              theNext = new String(st.sval);
-              st.pushBack();
-          }while(theNext.equalsIgnoreCase("VAR") == false);
               System.out.println("FINISHED CONSTS");
-          }  
+          }
+        assert false : "UNREACHABLE";
+        }
               
-              
-              
-          
-      
-      
       public void parseVars( StreamTokenizer st, BlockStatement block)
               throws PascalParseError, IOException
       {
