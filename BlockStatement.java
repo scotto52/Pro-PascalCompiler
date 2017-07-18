@@ -17,7 +17,7 @@ import java.util.*;
 
 public class BlockStatement extends Statement
 {
-    HashMap<String, ConstantPart> blockConstantTable = new HashMap<String, ConstantPart>();
+    HashSet<LabelPart> blockLabelSet = new HashSet<LabelPart>();
     // The block constant table has all the constants declared in the block
     HashMap<String,VariablePart> blockSymbolTable = new HashMap<String, VariablePart>();
     ArrayList<Statement> mySteps;
@@ -34,6 +34,13 @@ public class BlockStatement extends Statement
     public String toJavaCode()
     {
         StringBuffer b = new StringBuffer("{ // BEGIN \n");
+        // NOW PUT LABELS HERE
+        b.append("// LABELS \n");
+        for (LabelPart temp : blockLabelSet)
+        {
+            b.append(temp.toJavaCode());
+            b.append('\n');
+        }
         // NOW PUT VARS HERE
         b.append("// VARS \n");
         for(String var : blockSymbolTable.keySet())
@@ -62,6 +69,20 @@ public class BlockStatement extends Statement
         }
         blockSymbolTable.put(it.getVariableName(), it );
         return result;
+    }
+    
+    public boolean addLabel(LabelPart it)
+    {
+        boolean result = true;
+        LabelPart lab = it;
+        boolean isIn = blockLabelSet.contains(lab);
+        if(isIn == true)
+          {
+              result = false;
+              System.out.println("WARNING DUPLICATE LABEL NAME  " + it.getLabelName() );
+          }
+          blockLabelSet.add(lab);
+          return result;
     }
     
     /*public boolean addConstant(ConstantPart it)

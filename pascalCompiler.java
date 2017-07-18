@@ -26,13 +26,17 @@ public class pascalCompiler {
         try 
     {
       String sourceCode = 
+              "[INHERIT('SYS$LIBRARY:STARLET')] \n" + 
               "PROGRAM HelloWorld ; \n"+
+              "LABEL\n"+
+              "ERRLAB;"+
               "CONST\n"+
               "D = 5;"+
               "VAR\n"+
               " A:BOOLEAN;"+
               " B:REAL;"+
               " Bigvarname:INTEGER;"+
+              "[EXTERNAL,ASYNCHRONOUS] \n" +
               " BEGIN \n" +
               " B := D * 6 ; \n" +
               " IF 43 > 33 AND 4 > 1 THEN \n"+

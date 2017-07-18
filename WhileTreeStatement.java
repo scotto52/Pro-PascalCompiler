@@ -21,7 +21,7 @@ public class WhileTreeStatement extends Statement
     }
     @Override public String toJavaCode()
     {
-        return "while( "+ expression.toJavaCode() + ") \n { \n " +
+        return "while )"+ expression.toJavaCode() + ") \n { \n " +
                 block.toJavaCode() + " \n} ";
     }
 }

@@ -11,7 +11,7 @@ import java.util.*;
 class SimpleParser
 { 
   HashMap<String,VariablePart> symbolTable = new HashMap<String,VariablePart>();
-  HashMap<String,ConstantPart> cSymbolTable = new HashMap<String,ConstantPart>();
+  HashSet<LabelPart> labelSet = new HashSet<LabelPart>();
   
   
   //-----------------------------------------------------------------------
@@ -75,7 +75,7 @@ class SimpleParser
         int token = st.nextToken();
         if(token != StreamTokenizer.TT_WORD)
         {
-            throw new PascalParseError("expected a statement here BOB");
+            throw new PascalParseError("expected a statement here");
         }
         if( "BEGIN".equalsIgnoreCase(st.sval))
         {
@@ -231,6 +231,21 @@ class SimpleParser
         return var  ;
       } 
       //----------------------------------------------------------
+      LabelPart makeLabel(String name) throws PascalParseError, IOException 
+      {
+          name = name.toLowerCase();
+          LabelPart lab = new LabelPart(name);
+          boolean isIn = labelSet.contains(lab);
+          if(isIn == true)
+          {
+           throw new PascalParseError("Label name already exists");
+          }
+              // NOT FOUND MAKE A NEW ONE
+              labelSet.add(lab);
+              return lab;
+          
+
+      }
       public TreePart parseStart(  BufferedReader in4)  throws PascalParseError, IOException 
       { 
         StreamTokenizer st = new StreamTokenizer(in4);
@@ -289,6 +304,47 @@ class SimpleParser
           javaCode += "\n" + result.toJavaCode();
           
           return javaCode;
+      }
+      
+      public void parseLabels (StreamTokenizer st, BlockStatement block)
+              throws PascalParseError, IOException
+      {
+          int token;
+          LabelPart l = null;
+          boolean keepGoing = true;
+          
+          while(keepGoing == true)
+          {
+              token = st.nextToken();
+              if("BEGIN".equalsIgnoreCase(st.sval) == true ||
+                      "CONST".equalsIgnoreCase(st.sval) == true ||
+                      "TYPE".equalsIgnoreCase(st.sval) == true ||
+                      "VAR".equalsIgnoreCase(st.sval) == true)
+              {// this is ok label can be empty list
+                  st.pushBack();
+                  keepGoing = false;
+                  return;
+              }
+              // find a name for the label
+              if(token != StreamTokenizer.TT_WORD)
+              {
+                  throw new PascalParseError("expected a Label identifier here " + token);
+              }
+              System.out.println("Found label "+ st.sval);
+              l = new LabelPart(st.sval);
+              if(block.addLabel(l) == false)
+              {
+                  throw new PascalParseError("Duplicate Label name "+ st.sval);
+              }
+              token = st.nextToken();
+              if(!(token == ';'))
+              {
+                  throw new PascalParseError("expected a comma ',' here");
+              }
+
+              System.out.println(" FINISHED LABELS ");
+          }
+          //assert false :"UNREACHABLE";
       }
       
       public void parseConsts(StreamTokenizer st, BlockStatement block)
@@ -417,6 +473,7 @@ class SimpleParser
               throw new PascalParseError("expected semi colon here ");
           }
           token = st.nextToken();
+          if(token == '[') token = parseCompilerHint(st, block);
           if(token != StreamTokenizer.TT_WORD)
           {
               throw new PascalParseError("expected BEGIN/VARIABLE name here ");
@@ -432,10 +489,17 @@ class SimpleParser
       {
           BlockStatement block = new BlockStatement(); assert block != null;
           int token = st.nextToken();
+          System.out.println("parseBlock/READING " + st.sval);
+          if(token == '[') token = parseCompilerHint(st, block);
           // Check existance of a constant or variable
           if(token != StreamTokenizer.TT_WORD)
           {
-              throw new PascalParseError("expected a BEGIN or CONST or VAR here ");
+              throw new PascalParseError("expected a BEGIN or LABEL or CONST or VAR here ");
+          }
+          if ("LABEL".equalsIgnoreCase(st.sval) == true)
+          {
+              parseLabels(st, block);
+              token = st.nextToken();
           }
           if ("CONST".equalsIgnoreCase(st.sval) == true)
           {
@@ -488,9 +552,16 @@ class SimpleParser
           // [1] GET PROGRAM
           int token = st.nextToken();
           
+          if(token == '[') token = parseCompilerHint(st, null);
+          
           if(token != StreamTokenizer.TT_WORD)
           {
               throw new PascalParseError("Programs begin with PROGRAM");
+          }
+          
+          if("PROGRAM".equalsIgnoreCase(st.sval)== false)
+          {
+              throw new PascalParseError("Programs must begin with PROGRAM got "+ st.sval);
           }
           
           //[2] GET IDENTIFIER (program name)
@@ -518,6 +589,36 @@ class SimpleParser
             ProgramStatement prgm = new ProgramStatement(programName, s);
             return prgm;
             
+      }
+      
+      public int parseCompilerHint (StreamTokenizer st, BlockStatement block)
+              throws PascalParseError, IOException
+      {
+          st.pushBack();
+          int token = st.nextToken();
+          if(token == '[') // check for start
+          {
+              System.out.println(" found start of a [ ");
+              String result = "[";
+              do
+              {
+                  if(token == StreamTokenizer.TT_WORD)
+                  {
+                      // To do could check
+                      result = result + " " + st.sval;
+                      System.out.println(" & " + st.sval);
+                  } // To do handle others
+                  token = st.nextToken();
+                  // WARNING COULD RUN OUT IF BADLY CODED
+              }while(token != ']');
+              
+              System.out.println("IGNOREING "+ result);
+              return st.nextToken();
+          }else
+          {
+              return token;
+          }
+          //assert false:"Unreachable";
       }
       
       public TreePart booleanExpression(StreamTokenizer st)
