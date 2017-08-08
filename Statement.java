@@ -11,9 +11,16 @@ package chapter2;
  */
 public class Statement extends TreePart // Marker class
 {
+    public String stringPascalComment = null;
+    
     public Statement()
     {
         super();
     }
     
+    public String toJavaCode()
+    {
+        if(stringPascalComment == null) return "";
+        return "/* " + stringPascalComment + "*/ ";
+    }
 }

@@ -248,14 +248,20 @@ class SimpleParser
       }
       public TreePart parseStart(  BufferedReader in4)  throws PascalParseError, IOException 
       { 
-        StreamTokenizer st = new StreamTokenizer(in4);
-        st.slashStarComments(false); 
-        st.slashSlashComments(false);
-        st.eolIsSignificant(false);
-        st.ordinaryChar('/'); 
-        st.parseNumbers();
-      
-        Statement result = parseProgram( st ) ;//CHAGEN 
+        StreamTokenizer st = new ProPascalStreamTokenizer(in4);
+        //st.slashStarComments(false); 
+        //st.eolIsSignificant(false);
+        //st.ordinaryChar('/'); 
+        //st.parseNumbers();
+        Statement result = null;
+        try
+        {
+            result = parseProgram( st );
+        } catch (PascalParseError e)
+        {
+            System.out.println("ERROR " + e + " LINE "+ st.lineno());
+        }
+
         return result ; 
       } 
       

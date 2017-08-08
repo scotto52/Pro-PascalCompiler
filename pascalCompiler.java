@@ -32,6 +32,7 @@ public class pascalCompiler {
               "ERRLAB;"+
               "CONST\n"+
               "D = 5;"+
+              " (* THIS IS A COMMENT TEST *) "+ 
               "VAR\n"+
               " A:BOOLEAN;"+
               " B:REAL;"+

@@ -17,10 +17,11 @@ public class WriteLnTree extends Statement {
     {
         this.expression = theExpression;
     }
-    public String toJavaCode()
+    @Override public String toJavaCode()
     {
         String result = "System.out.println( " ;
-        result = result + expression.toJavaCode() + ");// WriteLn ";
+        result = result + expression.toJavaCode() + 
+                ");/* WriteLn */ " + super.toJavaCode();
         return result;
     }
 }
