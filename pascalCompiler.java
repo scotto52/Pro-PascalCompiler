@@ -28,28 +28,22 @@ public class pascalCompiler {
       String sourceCode = 
               "[INHERIT('SYS$LIBRARY:STARLET')] \n" + 
               "PROGRAM HelloWorld ; \n"+
-              "LABEL\n"+
-              "ERRLAB;"+
+              "[INHERIT('SYS$LIBRARY:STARLET')] \n" +
               "CONST\n"+
-              "D = 5;"+
+              "Failure = 0;"+
               " (* THIS IS A COMMENT TEST *) "+ 
               "VAR\n"+
               " A:BOOLEAN;"+
-              " B:REAL;"+
               " Bigvarname:INTEGER;"+
-              "[EXTERNAL,ASYNCHRONOUS] \n" +
               " BEGIN \n" +
-              " B := D * 6 ; \n" +
+              " Bigvarname[6] := 1 * 2 ; (* YES I KNOW ITS NOT AN ARRAY *) \n "+
+              "\n"+
               " IF 43 > 33 AND 4 > 1 THEN \n"+
-              "     Writeln( A ) ; \n"+
-              " ELSE \n"+
-              "     Writeln( B ) ; \n"+
-              " Bigvarname := 1; "+
-              " REPEAT \n "+
-              "     Writeln(Bigvarname) ; \n" +
-              "     Bigvarname : = Bigvarname +1 ; \n" +
-              " UNTIL Bigvarname > 10; " +
-              " Writeln( Bigvarname) ;"+
+              " BEGIN "+
+              "     Writeln( A * Failure) ; \n"+
+              "     Writeln( 5*7 ) ; \n"+
+              " END "+
+              " Writeln(Bigvarname) ; \n" +
               "END ." ;
       BufferedReader in4 = new BufferedReader(new StringReader(sourceCode));
       

@@ -826,8 +826,40 @@ class SimpleParser
             }
             RepeatStatement repeatState = new RepeatStatement(block, expression);
             return repeatState;
-              
           }
+      
+      public TreePart parseVariable(StreamTokenizer st)
+              throws PascalParseError, IOException
+      {
+          int token = st.nextToken();
+          if( token != StreamTokenizer.TT_WORD)
+          {
+              throw new PascalParseError("EXPECTED variable name in expression ");
+          }
+          // todo check here if the variable has been defined
+          String name = st.sval;
+          System.out.println("PARSE VARIABLE called << "+name + ">> ");
+          VariablePart var = makeVariable(st.sval);
+          
+          token = st.nextToken();
+          if(token == '[')
+          {
+              System.out.println("START ARRAY EXPRESSION");
+              TreePart expression = booleanGroupExpression(st);
+              System.out.println("END ARRAY EXPRESSION");
+              token = st.nextToken();
+              if(token != ']')
+              {
+                  throw new PascalParseError("EXPECTED ] Not " + token);
+              }
+              ArrayPart it = new ArrayPart(var, expression);
+              return it;
+          }else st.pushBack();
+          
+          System.out.println("parseVariable END");
+          return var;
+          
+      }
 } // END CLASS 
  
 
