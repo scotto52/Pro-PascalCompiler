@@ -118,6 +118,18 @@ class SimpleParser
             VariablePart var = makeVariable(st.sval);
             
             token = st.nextToken();
+            if(token == '[')
+            {
+                System.out.println("START ARRAY EXPRESSION");
+                TreePart expression = booleanGroupExpression(st);
+                System.out.println("END ARRAY EXPRESSION");
+                token = st.nextToken();
+                if(token != ']')
+                {
+                    throw new PascalParseError("EXPECTED ']'. Not " + token);
+                }
+                token = st.nextToken();
+            }
             if (token != ':')
             {
                 throw new PascalParseError("EXPECTED := in assignment ");
@@ -147,7 +159,8 @@ class SimpleParser
       if(  token == StreamTokenizer.TT_WORD ) 
       { 
          System.out.println( " VARIABLE " + st.sval ) ; 
-         return makeVariable(st.sval ); 
+         st.pushBack();
+         return parseVariable(st); 
       } 
       if(  token ==  StreamTokenizer.TT_NUMBER ) 
       { 

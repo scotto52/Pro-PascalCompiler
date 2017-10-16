@@ -34,9 +34,9 @@ public class ArrayPart extends TreePart {
                 "[ " + indexExpression.toJavaCode() + " ]";
     }
     
-    public VariableType getType()
-    {
-        return codeBeforeArray.getType();
-    }
+    //public VariableType getType()
+    //{
+        //return codeBeforeArray.getType();
+    //}
     
 }

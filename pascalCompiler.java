@@ -26,24 +26,24 @@ public class pascalCompiler {
         try 
     {
       String sourceCode = 
-              "[INHERIT('SYS$LIBRARY:STARLET')] \n" + 
+              "[INHERIT('SYS$LIBRARY:STARLET')] " + 
               "PROGRAM HelloWorld ; \n"+
-              "[INHERIT('SYS$LIBRARY:STARLET')] \n" +
+              "[INHERIT('SYS$LIBRARY:STARLET')] " +
               "CONST\n"+
               "Failure = 0;"+
               " (* THIS IS A COMMENT TEST *) "+ 
               "VAR\n"+
-              " A:BOOLEAN;"+
-              " Bigvarname:INTEGER;"+
+              " A:BOOLEAN;\n"+
+              " Bigvarname:INTEGER; \n"+
               " BEGIN \n" +
-              " Bigvarname[6] := 1 * 2 ; (* YES I KNOW ITS NOT AN ARRAY *) \n "+
+              " Bigvarname[6] := Bigvarname[6] + 1; (* NOW WORKS *) \n "+
               "\n"+
               " IF 43 > 33 AND 4 > 1 THEN \n"+
               " BEGIN "+
               "     Writeln( A * Failure) ; \n"+
               "     Writeln( 5*7 ) ; \n"+
               " END "+
-              " Writeln(Bigvarname) ; \n" +
+              " Writeln(Bigvarname) ; " +
               "END ." ;
       BufferedReader in4 = new BufferedReader(new StringReader(sourceCode));
       
