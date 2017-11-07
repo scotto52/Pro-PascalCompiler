@@ -11,9 +11,9 @@ package chapter2;
  */
 public class AssignmentTree extends Statement {
     
-    VariablePart whereToPutResult;
+    TreePart whereToPutResult;
     TreePart expression;   
-    public AssignmentTree (VariablePart theVar, TreePart theExpression)
+    public AssignmentTree (TreePart theVar, TreePart theExpression)
     {
         super();
         assert theExpression != null : "No null expressions";

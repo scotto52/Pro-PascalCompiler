@@ -115,21 +115,12 @@ class SimpleParser
         if (token == StreamTokenizer.TT_WORD)
         {
             System.out.println( " VARIABLE " + st.sval);
-            VariablePart var = makeVariable(st.sval);
+            st.pushBack();
+            
+            TreePart var = parseVariable(st);
             
             token = st.nextToken();
-            if(token == '[')
-            {
-                System.out.println("START ARRAY EXPRESSION");
-                TreePart expression = booleanGroupExpression(st);
-                System.out.println("END ARRAY EXPRESSION");
-                token = st.nextToken();
-                if(token != ']')
-                {
-                    throw new PascalParseError("EXPECTED ']'. Not " + token);
-                }
-                token = st.nextToken();
-            }
+
             if (token != ':')
             {
                 throw new PascalParseError("EXPECTED := in assignment ");
@@ -475,13 +466,7 @@ class SimpleParser
               
           }while(token != ':');
           
-          token = st.nextToken();
-          if(token != StreamTokenizer.TT_WORD)
-          {
-              throw new PascalParseError("expected a Variable Type here ");
-          }
-          // This time
-          VariableType type = VariableType.getEnumerationForString(st.sval);
+          VariableType type = parseInLineType(st, block);
           for(VariablePart theVar : px)
           {
               theVar.setVariable(type);
@@ -503,6 +488,17 @@ class SimpleParser
           System.out.println(" FINISHED VARS");
       }
 
+      public VariableType parseInLineType(StreamTokenizer st, BlockStatement block)
+              throws PascalParseError,IOException
+      {
+          int token = st.nextToken();
+          if(token != StreamTokenizer.TT_WORD)
+          {
+              throw new PascalParseError("expected a Variable Type here");
+          }
+          VariableType type = VariableType.getEnumerationForString(st.sval);
+          return type;
+      }
       public Statement parseBlock(StreamTokenizer st)
               throws PascalParseError,IOException
       {
