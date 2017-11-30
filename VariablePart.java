@@ -15,6 +15,7 @@ package chapter2;
    String variablename ; // For now will change later.
    VariableType whichPrimativeType;
    double defaultValue;
+   TypePart whatIsMyType;
    
    public VariablePart( String theName ) 
      { 
@@ -48,5 +49,15 @@ package chapter2;
    public void setDefaultValue(double d)
    {
        defaultValue = d;
+   }
+   
+   public VariableType getType() {
+       
+       return whichPrimativeType;
+   }
+   
+   public void setType(TypePart whichType)
+   {
+       this.whatIsMyType = whichType;
    }
  } 

@@ -466,10 +466,10 @@ class SimpleParser
               
           }while(token != ':');
           
-          VariableType type = parseInLineType(st, block);
+          TypePart type = parseInLineType(st, block);
           for(VariablePart theVar : px)
           {
-              theVar.setVariable(type);
+              theVar.setType(type);
           }
           token = st.nextToken();
           if (token != ';')
@@ -488,7 +488,7 @@ class SimpleParser
           System.out.println(" FINISHED VARS");
       }
 
-      public VariableType parseInLineType(StreamTokenizer st, BlockStatement block)
+      public TypePart parseInLineType(StreamTokenizer st, BlockStatement block)
               throws PascalParseError,IOException
       {
           int token = st.nextToken();
@@ -496,8 +496,78 @@ class SimpleParser
           {
               throw new PascalParseError("expected a Variable Type here");
           }
+          System.out.println(st.sval + " found ... is it array?");
+          if("Array".equalsIgnoreCase(st.sval))
+          {
+              System.out.println("ARRAY FOUND");
+              token = st.nextToken();
+              if(token != '[')
+              {
+                  throw new PascalParseError("Expected [ after key word Array");
+              }
+              st.ordinaryChar('.'); //allow parse of ..
+              token = st.nextToken();
+              int lowRange = 0;
+              int highRange = lowRange;
+              
+              if (token == st.TT_NUMBER)
+              {
+                  lowRange = (int)st.nval;
+                  System.out.println("Got bottom range "+ lowRange);
+              } else
+              {
+                  if("VOLATILE".equalsIgnoreCase(st.sval))
+                    {
+                        highRange = -1; //if high range is less then VOLATILE
+                    }
+                  else 
+                      throw new PascalParseError("ARRAY [ EXPECTED NUMBER OR VOLATILE HERE 1.");
+                  }
+                  // CURRENTLY THIS WILL COMPILE ARRAY [ VOLATILE..35 ] OF INT CAN YOU FX THIS?
+                  token = st.nextToken();
+                  System.out.println(" Token = " + token);
+                  if(token == '.')
+                  {
+                    System.out.println("Got here");
+                      //token = st.nextToken();
+                      if(st.nextToken()!= '.')
+                      {
+                          System.out.println(" Token = " + st.nval);
+                          throw new PascalParseError("ARRAY [ N.. RANGE ");
+                      }
+                      token = st.nextToken();
+                      if(token != st.TT_NUMBER)
+                      {
+                          throw new PascalParseError("ARRAY [ N.. EXPECTED NUMBER HERE ");
+                      }
+                      else
+                      {
+                          highRange = (int)st.nval;
+                          st.parseNumbers(); //rest full stop.
+                          token = st.nextToken();
+                          if(token != ']')
+                          {
+                              throw new PascalParseError("ARRAY [N..M EXPECTED ']' HERE ");
+                          }
+                          else
+                          {
+                              token = st.nextToken();
+                              if(token != st.TT_WORD || !("OF".equalsIgnoreCase(st.sval)))
+                              {
+                                  throw new PascalParseError("ARAY [N..M] EXPECTED 'OF' HERE");
+                              }
+                              System.out.println("Getting Off");
+                              TypePart theStuffInTheArray = parseInLineType(st, block);
+                              ArrayType arrayThing = new ArrayType(lowRange, highRange, theStuffInTheArray);
+                              return arrayThing;
+                          }
+                      }
+              } else
+                      throw new PascalParseError("ARRAY [N.. missing dots");
+          }
+          System.out.println("No not an array must be built in." + st.sval);
           VariableType type = VariableType.getEnumerationForString(st.sval);
-          return type;
+          return new BuiltInType(type);
       }
       public Statement parseBlock(StreamTokenizer st)
               throws PascalParseError,IOException
@@ -509,7 +579,7 @@ class SimpleParser
           // Check existance of a constant or variable
           if(token != StreamTokenizer.TT_WORD)
           {
-              throw new PascalParseError("expected a BEGIN or LABEL or CONST or VAR here ");
+              throw new PascalParseError("expected a BEGIN or LABEL or CONST or VAR or TYPE here ");
           }
           if ("LABEL".equalsIgnoreCase(st.sval) == true)
           {
@@ -526,7 +596,13 @@ class SimpleParser
               parseVars(st, block);
               token = st.nextToken();
           }
+          if ("TYPE".equalsIgnoreCase(st.sval) == true) {
+              
+              parseTypes(st, block);
+              token = st.nextToken();
+          }
           //[1] PARSE BLOCK
+          if(token == '[') token = parseCompilerHint(st, block);
           if(token != StreamTokenizer.TT_WORD)
           {
               throw new PascalParseError("expected a BEGIN here at this block");
@@ -604,6 +680,54 @@ class SimpleParser
             ProgramStatement prgm = new ProgramStatement(programName, s);
             return prgm;
             
+      }
+      
+      public TreePart parseTypes(StreamTokenizer st, BlockStatement block)
+              throws PascalParseError, IOException
+      {
+          TreePart thisWillBeAlistOneDay = parseLine(st, block);
+          return thisWillBeAlistOneDay;
+      }
+      
+      public TreePart parseLine(StreamTokenizer st, BlockStatement block)
+              throws PascalParseError, IOException
+      {
+          String identifier = "NOT FOUND";
+          
+          int token = st.nextToken();
+          if (token != StreamTokenizer.TT_WORD)
+          {
+              throw new PascalParseError("expected an Identifier name here got '" + token);
+          }
+          identifier = (String) st.sval.toString(); //get a copy
+          System.out.println("Storing ID = " + identifier);
+          
+          token = st.nextToken();
+          if (token != '=')
+          {
+              throw new PascalParseError("expected an = here between identifier " + token);
+          }
+          token = st.nextToken();
+          if (token != StreamTokenizer.TT_WORD)
+          {
+              throw new PascalParseError("expected an Identifier name here got '" + token);
+          }
+          //we should now have a word which will be an array or record
+          if("ARRAY".equalsIgnoreCase(st.sval))
+          {
+              st.pushBack();
+              TypePart arrayDef = this.parseInLineType(st, block);
+              TypeDefinitionPart result = new TypeDefinitionPart(identifier, arrayDef);
+              token = st.nextToken();
+              if (token != ';')
+              {
+                  throw new PascalParseError("Expected ; at end of definition got '" + token);
+              }
+              return result;
+          }
+          // handle record
+          assert false;
+          return null;
       }
       
       public int parseCompilerHint (StreamTokenizer st, BlockStatement block)

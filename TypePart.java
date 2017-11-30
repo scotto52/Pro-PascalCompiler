@@ -15,28 +15,6 @@ public class TypePart extends TreePart{
     {
         return " toJavaCode for type not implemented";
     }
-    
-    public class ArrayType extends TypePart
-    {
-        public String toJavaCode()
-        {
-            return " toJavaCode for type not implemented";
-        }
-    }
-    
-    public class BuiltInType extends TypePart
-    {
-        VariableType whichPrimativeType = VariableType.INTEGER;
-        
-        public BuiltInType(VariableType builtInTypeName)
-        {
-            whichPrimativeType = builtInTypeName;
-        }
-        
-        public String toJavaCode()
-        {
-            return VariableType.getJavaStringFor(whichPrimativeType);
-        }
-    }
-    
+
+    public void setName(String name) {}
 }

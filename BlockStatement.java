@@ -21,6 +21,7 @@ public class BlockStatement extends Statement
     // The block constant table has all the constants declared in the block
     HashMap<String,VariablePart> blockSymbolTable = new HashMap<String, VariablePart>();
     ArrayList<Statement> mySteps;
+    HashMap<String,TypeDefinitionPart> typeSymbolTable = new HashMap<>();
     // The block symbol table has all the variables declared in the block
     public BlockStatement()
     {

@@ -32,11 +32,13 @@ public class pascalCompiler {
               "CONST\n"+
               "Failure = 0;"+
               " (* THIS IS A COMMENT TEST *) "+ 
+              "TYPE\n" +
+              " String255 = Array[0..255] of INTEGER; \n " +
               "VAR\n"+
               " A:BOOLEAN;\n"+
-              " Bigvarname:INTEGER; \n"+
+              " Bigvarname:Array[0..10] of INTEGER; \n"+
               " BEGIN \n" +
-              " Bigvarname[6] := Bigvarname[6] + 1; (* NOW WORKS *) \n "+
+              " Bigvarname[6] := 1 * 2 + Bigvarname[1+1]; (* THIS IS A COMMENT AGAIN *) \n "+
               "\n"+
               " IF 43 > 33 AND 4 > 1 THEN \n"+
               " BEGIN "+
