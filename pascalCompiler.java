@@ -30,10 +30,15 @@ public class pascalCompiler {
               "PROGRAM HelloWorld ; \n"+
               "[INHERIT('SYS$LIBRARY:STARLET')] " +
               "CONST\n"+
-              "Failure = 0;"+
-              " (* THIS IS A COMMENT TEST *) "+ 
+              "Failure = 0; \n" +
+              " (* THIS IS A COMMENT TEST *) \n" + 
               "TYPE\n" +
               " String255 = Array[0..255] of INTEGER; \n " +
+              " Colour = Record \n" +
+              "             red:Integer; \n" +
+              "             green:Integer; \n" +
+              "             blue:Integer; \n" +
+              "         End; \n" +
               "VAR\n"+
               " A:BOOLEAN;\n"+
               " Bigvarname:Array[0..10] of INTEGER; \n"+

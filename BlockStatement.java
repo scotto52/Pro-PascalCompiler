@@ -19,9 +19,9 @@ public class BlockStatement extends Statement
 {
     HashSet<LabelPart> blockLabelSet = new HashSet<LabelPart>();
     // The block constant table has all the constants declared in the block
-    HashMap<String,VariablePart> blockSymbolTable = new HashMap<String, VariablePart>();
+    Map<String,VariablePart> blockSymbolTable = new HashMap<>();
     ArrayList<Statement> mySteps;
-    HashMap<String,TypeDefinitionPart> typeSymbolTable = new HashMap<>();
+    Map<String,TypeDefinitionPart> typeSymbolTable = new HashMap<>();
     // The block symbol table has all the variables declared in the block
     public BlockStatement()
     {
@@ -42,16 +42,35 @@ public class BlockStatement extends Statement
             b.append(temp.toJavaCode());
             b.append('\n');
         }
-        // NOW PUT VARS HERE
-        b.append("// VARS \n");
-        for(String var : blockSymbolTable.keySet())
+        
+        if(!this.typeSymbolTable.isEmpty())
         {
-            VariablePart t = blockSymbolTable.get(var);
-            b.append(t.getDefinitionString());
+            b.append("// TYPES");
+            for(String tname : this.typeSymbolTable.keySet())
+            {
+                TypePart t = this.typeSymbolTable.get(tname);
+                b.append(t.toJavaCode());
+            }
+        }
+        // NOW PUT VARS HERE
+        if(!blockSymbolTable.isEmpty())
+        {
+            b.append("// VARS \n");
+            for(String var : blockSymbolTable.keySet())
+            {
+                VariablePart t = blockSymbolTable.get(var);
+                b.append(t.getDefinitionString());
+            }
+            b.append("// END VARS \n");
         }
         
+        b.append("// BEGIN\n");
         for (Statement s: mySteps)
         {
+            System.out.println("--------STATEMENT-------");
+            assert s != null : " Added null statement";
+            System.out.println(">" + s);
+            assert s.toJavaCode()!=null: "WEIRDNESS";
             b.append(s.toJavaCode());
             b.append('\n');
         }
