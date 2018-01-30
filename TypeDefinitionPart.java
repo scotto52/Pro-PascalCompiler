@@ -25,4 +25,9 @@ public class TypeDefinitionPart extends TreePart {
         
         return " /* TYPE DEFINITION */ ";
     }
+    
+    public String getTypeName()
+   {
+       return identifier;
+   }
 }

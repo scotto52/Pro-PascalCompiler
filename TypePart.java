@@ -10,11 +10,19 @@ package chapter2;
  * @author Robertson
  */
 public class TypePart extends TreePart{
+    //String typeName;
     
+        
     public String toJavaCode()
     {
         return " toJavaCode for type not implemented";
     }
 
     public void setName(String name) {}
+    
+    /*public String getTypeName() {
+        return typeName;
+    } */
+
+    
 }

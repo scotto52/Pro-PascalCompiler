@@ -21,8 +21,10 @@ public class BlockStatement extends Statement
     // The block constant table has all the constants declared in the block
     Map<String,VariablePart> blockSymbolTable = new HashMap<>();
     ArrayList<Statement> mySteps;
-    Map<String,TypeDefinitionPart> typeSymbolTable = new HashMap<>();
+    Map<String,TypePart> typeSymbolTable = new HashMap<>();
     // The block symbol table has all the variables declared in the block
+    BlockStatement parentBlock;
+    
     public BlockStatement()
     {
         mySteps = new ArrayList<Statement>();
@@ -103,6 +105,17 @@ public class BlockStatement extends Statement
           }
           blockLabelSet.add(lab);
           return result;
+    }
+    
+        public boolean addType(String id, TypePart it)
+    {
+        boolean result = typeSymbolTable.containsKey(id);
+        if (result = false)
+        {
+            System.out.println("WARNING DUPLICATE TYPE NAME  " + id );
+        }
+        typeSymbolTable.put(id, it );
+        return result;
     }
     
     /*public boolean addConstant(ConstantPart it)

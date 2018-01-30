@@ -247,7 +247,7 @@ class SimpleParser
               // NOT FOUND MAKE A NEW ONE
               labelSet.add(lab);
               return lab;
-          
+       
 
       }
       public TreePart parseStart(  BufferedReader in4)  throws PascalParseError, IOException 
@@ -491,55 +491,27 @@ class SimpleParser
       public TypePart parseInLineType(StreamTokenizer st, BlockStatement block)
               throws PascalParseError,IOException
       {
-          String identifier = "NOT found.";
           int token = st.nextToken();
           if(token != StreamTokenizer.TT_WORD)
           {
-              throw new PascalParseError("expected an Identifier name here, got '" + token);
+              throw new PascalParseError("expected a Variable Type here");
           }
-          
-          identifier = (String)st.sval.toString(); //get copy.
-          System.out.println("STORING ID = " + identifier);
-          
-          token = st.nextToken();
-          if (token != '=') {
-              throw new PascalParseError("expected an '=' between identifier " + token);
-          }
-          token = st.nextToken();
-          if (token != StreamTokenizer.TT_WORD) {
-              throw new PascalParseError("expected an Identifier name here got '" + token);
-          }
-          
           //Check for either array or record
           if("Array".equalsIgnoreCase(st.sval))
           {
               st.pushBack();
-              //System.out.println(st.sval + " found ... is it array?");
-              //return this.parseArray(st, block);
-              TypePart arrayDef = this.parseArray(st, block);
-              TypeDefinitionPart result = new TypeDefinitionPart(identifier, arrayDef);
-              System.out.println("Array parsed.");
-              return result;
-          }else if ("RECORD".equalsIgnoreCase(st.sval))
-          {
-              //System.out.println(st.sval + " found Record ");
-              //return this.parseRecord(st, block);
-              System.out.println("Parsing Record " + identifier);
-              st.pushBack();
-              TypePart t = this.parseRecord(st, block);
-              t.setName(identifier); //set name for later use
-              //block.addType(identifier, t);
-              System.out.println("Record parsed.");
-          }else
-          {
-            assert false : "BUILT INs like INT not handled ";
-            //System.out.println("No not an array must be built in." + st.sval);
-            //VariableType type = VariableType.getEnumerationForString(st.sval);
-            //return new BuiltInType(type);
+              System.out.println(st.sval + " found ... is it array?");
+              return this.parseArray(st, block);
           }
-          
-          assert false;
-          return null;
+          if ("RECORD".equalsIgnoreCase(st.sval))
+          {
+              System.out.println(st.sval + " found Record ");
+              return this.parseRecord(st, block);
+          }
+          // To Do Look up if we have a type definition
+          System.out.println("No not an array must be built in." + st.sval);
+          VariableType type = VariableType.getEnumerationForString(st.sval);
+          return new BuiltInType(type);
       }
       
       public TypePart parseArray(StreamTokenizer st, BlockStatement block)
@@ -690,7 +662,7 @@ class SimpleParser
           }
           if ("TYPE".equalsIgnoreCase(st.sval) == true) {
               
-              parseTypes(st, block);
+              parseTypesList(st, block);
               token = st.nextToken();
           }
           if ("VAR".equalsIgnoreCase(st.sval) == true)
@@ -779,19 +751,20 @@ class SimpleParser
             
       }
       
-      public TreePart parseTypes(StreamTokenizer st, BlockStatement block)
+      /*public TreePart parseTypes(StreamTokenizer st, BlockStatement block)
               throws PascalParseError, IOException
       {
-          TreePart thisWillBeAlistOneDay = parseLine(st, block);
+          TreePart thisWillBeAlistOneDay = parseSingleType(st, block);
           return thisWillBeAlistOneDay;
       }
+      */
       
       public void parseTypesList(StreamTokenizer st, BlockStatement block)
               throws PascalParseError, IOException
       {
           while(true)
           {
-              TreePart thisWillBeAlistOneDay = parseInLineType(st, block);
+              TreePart thisWillBeAlistOneDay = parseSingleType(st, block);
               int token = st.nextToken();
               if(token != ';')
               {
@@ -812,7 +785,7 @@ class SimpleParser
           
       }
       
-      public TreePart parseLine(StreamTokenizer st, BlockStatement block)
+      public TreePart parseSingleType(StreamTokenizer st, BlockStatement block)
               throws PascalParseError, IOException
       {
           String identifier = "NOT FOUND";
@@ -822,6 +795,7 @@ class SimpleParser
           {
               throw new PascalParseError("expected an Identifier name here got '" + token);
           }
+          // TO DO handle the word PACKED HERE.
           identifier = (String) st.sval.toString(); //get a copy
           System.out.println("Storing ID = " + identifier);
           
@@ -839,16 +813,35 @@ class SimpleParser
           if("ARRAY".equalsIgnoreCase(st.sval))
           {
               st.pushBack();
-              TypePart arrayDef = this.parseInLineType(st, block);
+              TypePart arrayDef = this.parseArray(st, block);
               TypeDefinitionPart result = new TypeDefinitionPart(identifier, arrayDef);
-              token = st.nextToken();
-              if (token != ';')
-              {
-                  throw new PascalParseError("Expected ; at end of definition got '" + token);
-              }
+              System.out.println("Array parsed");
               return result;
           }
-          // handle record
+          else if("RECORD".equalsIgnoreCase(st.sval)) {
+              System.out.println("Parsing Record " + identifier);
+              st.pushBack();
+              TypePart t = this.parseRecord(st, block);
+              assert t != null;
+              t.setName(identifier);
+              //TypeDefinitionPart typeDefinition = new TypeDefinitionPart(identifier, t); 
+              block.addType(identifier, t);
+              System.out.println("Record parsed.");
+              return null;
+          }
+          else {
+                    assert false : "BUILT INs like INT not handled";
+                    /// TO DO handle the case where someone types
+                    /* Type
+                    int = INTEGER;
+                    short = INTEGER;
+                    float = REAL;
+                    */
+                    // To Do handle set of
+                    // To Do handle
+                    // To Do handle file of
+                    // To Do handle pointers via
+          }
           assert false;
           return null;
       }
@@ -1116,6 +1109,7 @@ class SimpleParser
           return var;
           
       }
+      
 } // END CLASS 
  
 
