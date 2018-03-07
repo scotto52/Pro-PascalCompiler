@@ -10,9 +10,17 @@ package chapter2;
  * @author Robertson
  */
 public class TypePart extends TreePart{
-    //String typeName;
+    String typeName;
     
-        
+    public String toString() {
+        return this.toJavaCode();
+    }
+    
+    public String getJavaAllocationCode() {
+        assert false;
+        return " // getJavaAllocationCode ";
+    }
+    
     public String toJavaCode()
     {
         return " toJavaCode for type not implemented";
@@ -20,9 +28,11 @@ public class TypePart extends TreePart{
 
     public void setName(String name) {}
     
-    /*public String getTypeName() {
+
+    
+    public String getName() {
         return typeName;
-    } */
+    }
 
     
 }

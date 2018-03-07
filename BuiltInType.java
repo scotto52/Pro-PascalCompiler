@@ -17,6 +17,14 @@ public class BuiltInType extends TypePart {
         {
             whichPrimativeType = builtInTypeName;
         }
+        
+        public String getJavaAllocationCode() {
+            return " = 0 ";
+        }
+        
+        public String getName() {
+            return VariableType.getJavaStringFor(whichPrimativeType);
+        }
 
         public String toJavaCode()
         {

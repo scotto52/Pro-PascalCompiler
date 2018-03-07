@@ -26,11 +26,17 @@ package chapter2;
    
    public String toJavaCode()
    { 
-       return  "(VAR) "+variablename  ; 
+       return  variablename  ; 
    } 
    public String getDefinitionString()
    {
        //return "float" + variablename + " = 0.0; //default to 0.0\n" ;
+       if(whatIsMyType != null)
+       {
+           return whatIsMyType.getName() +
+                   " " + variablename + " " +
+                   whatIsMyType.getJavaAllocationCode() + ";\n";
+       }
        return VariableType.getJavaStringFor(whichPrimativeType)+
                " "+ variablename + " = " + defaultValue + ";\n";
    }

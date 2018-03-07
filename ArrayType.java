@@ -25,5 +25,14 @@ public class ArrayType extends TypePart {
     public String toJavaCode(){
         return ofWhat.toJavaCode() + "[ ]";
     }
+    
+    public String getName() {
+        return ofWhat.getName();
+    }
+    
+    public String getJavaAllocationCode()
+    {
+        return " = new " + getName() + "[" + (highRange - lowRange) + "]"; //simulate stack allocation ";
+    }
 }
 

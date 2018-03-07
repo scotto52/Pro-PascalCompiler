@@ -38,7 +38,7 @@ public class RecordType extends TypePart {
     
     public String toJavaCode()
     {
-        String result = "//-------------------------------\nclass ";
+        String result = "//-------------------------------\n static class ";
         if(recordName == null)
         {
             result = result + " CRecord" + myFields.hashCode() + " \n{\n ";
@@ -56,5 +56,14 @@ public class RecordType extends TypePart {
         return result;
     
     }
+    
+    public String getJavaAllocationCode() {
+        return " = new " + getName() + "(); //simulate stack allocation " ;
+    }
+    
+    public String getName() {
+        return recordName;
+    }
+    
 }
 

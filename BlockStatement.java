@@ -36,15 +36,20 @@ public class BlockStatement extends Statement
     @Override
     public String toJavaCode()
     {
-        StringBuffer b = new StringBuffer("{ // BEGIN \n");
+        return this.toJavaCode(false);
+    }
+    public String toJavaCode(boolean isTop)
+    {
+        StringBuffer b = new StringBuffer(" \n");
         // NOW PUT LABELS HERE
+        if(!this.blockLabelSet.isEmpty()) {
         b.append("// LABELS \n");
+        }
         for (LabelPart temp : blockLabelSet)
         {
             b.append(temp.toJavaCode());
             b.append('\n');
         }
-        
         if(!this.typeSymbolTable.isEmpty())
         {
             b.append("// TYPES");
@@ -54,6 +59,10 @@ public class BlockStatement extends Statement
                 b.append(t.toJavaCode());
             }
         }
+        if(isTop)
+            b.append("public static void main(String[] args) \n{\n gConnectTodatabase();\n");
+        else
+            b.append("{\n // BLOCK BEGINING ");
         // NOW PUT VARS HERE
         if(!blockSymbolTable.isEmpty())
         {
@@ -62,11 +71,11 @@ public class BlockStatement extends Statement
             {
                 VariablePart t = blockSymbolTable.get(var);
                 b.append(t.getDefinitionString());
+                b.append('\n');
             }
             b.append("// END VARS \n");
         }
-        
-        b.append("// BEGIN\n");
+        b.append("// BEGIN CODE\n");
         for (Statement s: mySteps)
         {
             System.out.println("--------STATEMENT-------");
@@ -76,7 +85,7 @@ public class BlockStatement extends Statement
             b.append(s.toJavaCode());
             b.append('\n');
         }
-        b.append("} // END \n");
+        b.append("} // END BLOCK \n");
         return b.toString();
     }
     
@@ -93,8 +102,7 @@ public class BlockStatement extends Statement
         return result;
     }
     
-    public boolean addLabel(LabelPart it)
-    {
+    public boolean addLabel(LabelPart it) {
         boolean result = true;
         LabelPart lab = it;
         boolean isIn = blockLabelSet.contains(lab);
@@ -107,15 +115,20 @@ public class BlockStatement extends Statement
           return result;
     }
     
-        public boolean addType(String id, TypePart it)
-    {
+    public boolean addType(String id, TypePart it) {
+        id = id.toLowerCase(); //remove case
         boolean result = typeSymbolTable.containsKey(id);
-        if (result = false)
+        if (result != false)
         {
             System.out.println("WARNING DUPLICATE TYPE NAME  " + id );
         }
         typeSymbolTable.put(id, it );
+        System.out.println("Record " + id + " added to list of Types.");
         return result;
+    }
+       
+    public TypePart getType (String name) {
+       return typeSymbolTable.get(name.toLowerCase());
     }
     
     /*public boolean addConstant(ConstantPart it)

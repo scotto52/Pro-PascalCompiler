@@ -6,9 +6,11 @@
 package chapter2;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 /**
  *
@@ -23,41 +25,20 @@ public class pascalCompiler {
         
     public static void main(String[] args) {
         // TODO code application logic here
+        BufferedWriter writer = null;
         try 
     {
-      String sourceCode = 
-              "[INHERIT('SYS$LIBRARY:STARLET')] " + 
-              "PROGRAM HelloWorld ; \n"+
-              "[INHERIT('SYS$LIBRARY:STARLET')] " +
-              "CONST\n"+
-              "Failure = 0; \n" +
-              " (* THIS IS A COMMENT TEST *) \n" + 
-              "TYPE\n" +
-              " String255 = Array[0..255] of INTEGER; \n " +
-              " Colour = Record \n" +
-              "             red:Integer; \n" +
-              "             green:Integer; \n" +
-              "             blue:Integer; \n" +
-              "         End; \n" +
-              "VAR\n"+
-              " A:BOOLEAN;\n"+
-              " Bigvarname:Array[0..10] of INTEGER; \n"+
-              " BEGIN \n" +
-              " Bigvarname[6] := 1 * 2 + Bigvarname[1+1]; (* THIS IS A COMMENT AGAIN *) \n "+
-              "\n"+
-              " IF 43 > 33 AND 4 > 1 THEN \n"+
-              " BEGIN "+
-              "     Writeln( A * Failure) ; \n"+
-              "     Writeln( 5*7 ) ; \n"+
-              " END "+
-              " Writeln(Bigvarname) ; " +
-              "END ." ;
-      BufferedReader in4 = new BufferedReader(new StringReader(sourceCode));
+      BufferedReader in4;
+      in4 = new BufferedReader(new FileReader("C:/Users/Robertson/Documents/NetBeansProjects/Chapter6/src/chapter2/TestPascal.txt"));
       
       SimpleParser myParser = new SimpleParser(); 
       assert myParser != null ; 
       String javacodeString = myParser.expressionToJava(in4);
-      System.out.println("PARSE OK "+ javacodeString); 
+      System.out.println("PARSE OK //------\n" + "\n/------");
+      writer = new BufferedWriter(
+                    new FileWriter("C:/Users/Robertson/Documents/NetBeansProjects/Chapter6/src/chapter2/JavaOutput.java"));
+      writer.write(javacodeString);
+      System.out.println("FILE SAVED OK");
      } 
     catch(EOFException e)
     {
@@ -65,12 +46,24 @@ public class pascalCompiler {
     }
     catch( IOException e )
     { 
-      System.out.println("IO Exception ");
+      System.out.println("IO Exception " + e);
     }
     catch( PascalParseError error ) 
     { 
        System.out.println("Eerror " + error + " Line " ) ; 
     } 
+        finally
+        {
+            try
+            {
+                if (writer != null)
+                    writer.close();
+            }
+            catch (IOException e)
+            {
+                System.out.println("Error " + e);
+            }
+        }
     }
     
     

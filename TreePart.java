@@ -15,8 +15,9 @@ public class TreePart
    {
    }
    public String toString(){ return this.toJavaCode() ; } 
-  public String toJavaCode() 
-  { 
+   
+   public String toJavaCode() 
+    { 
     return " toJavaCode not implmented" ;
-  } 
+    }   
 } ;

@@ -24,7 +24,7 @@ public enum VariableType {
     private static String builtInTokensForJava[] =
     {
         "int",
-        "float",
+        "double",
         "string",
         "char",
         "boolean",

@@ -1,0 +1,21 @@
+PROGRAM HelloWorld ;
+
+TYPE
+	COLOUR = RECORD
+		red:INTEGER;
+		green:INTEGER;
+		blue:INTEGER;
+	END;
+VAR
+	myNumber : real ;        
+	myColor : Colour ;
+
+BEGIN
+        With myColor DO
+        BEGIN
+        	red := 34 ;
+        END ;
+        Writeln(myColor.red);
+	myNumber := 45 * 34;
+	Writeln(myNumber);
+END .
