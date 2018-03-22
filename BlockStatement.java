@@ -85,6 +85,7 @@ public class BlockStatement extends Statement
             b.append(s.toJavaCode());
             b.append('\n');
         }
+        if(isTop)b.append("gDisconnectToDatabase();\n");
         b.append("} // END BLOCK \n");
         return b.toString();
     }

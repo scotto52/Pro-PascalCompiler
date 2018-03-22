@@ -1,7 +1,7 @@
 // GENERATED CODE 
-package chapter2 ; 
+package chapter2; 
 import java.sql.*;
-// PROGRAM $$PROGRAMNAME$$
+// PROGRAM TESTSQLUPDATE
 class JavaOutput 
 {
    static Connection gTheDatabaseConnection = null; 
@@ -18,35 +18,43 @@ class JavaOutput
        }
        System.out.println("database successfully created");
    }
- 
-// TYPES//-------------------------------
- static class  COLOUR 
-{
-  int red;
- int green;
- int blue;
-}; //END OF CLASS 
+
+static void gDisconnectToDatabase()
+{ 
+ try 
+  { 
+   if(gTheDatabaseConnection!=null) gTheDatabaseConnection.close();
+   gTheDatabaseConnection = null; 
+  } catch (Exception e) 
+  {
+   System.err.println("DISCONNECT" + e.getClass().getName() + ": " + e.getMessage() );
+   System.exit(0);
+  }
+  
+  System.out.println("database successfully DISCONNECTED"); 
+} 
 public static void main(String[] args) 
 {
  gConnectTodatabase();
 // VARS 
-double mynumber  = 0 ;
-
-COLOUR mycolor  = new COLOUR(); //simulate stack allocation ;
+int x  = 0 ;
 
 // END VARS 
 // BEGIN CODE
- 
-{
- // BLOCK BEGINING // BEGIN CODE
-mycolor.red = (int) 34.0; //With ASSIGNMENT
 
-} // END BLOCK 
-
-System.out.println(mycolor.red);/* WriteLn */ 
-mynumber = (45.0 * 34.0);//ASSIGNMENT 
-
-System.out.println(mynumber);/* WriteLn */ 
+ //SQL UPDATE 
+ assert gTheDatabaseConnection != null ; 
+ try 
+ { 
+  String sqlInject = "Update myDatabase SET cop = " + x + " , thing = 23.0" ; 
+  Statement stmt = gTheDatabaseConnection.createStatement();
+  stmt.executeUpdate(sqlInject);
+  stmt.close();
+ } catch(SQLException e)
+ {
+  System.out.println(e.getMessage());
+ }
+gDisconnectToDatabase();
 } // END BLOCK 
  
  } // END PROGRAM

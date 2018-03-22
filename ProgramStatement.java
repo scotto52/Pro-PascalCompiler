@@ -17,8 +17,8 @@ public class ProgramStatement extends Statement{
         this.name = called;
         this.blk = block;
     }
-    static String header = "package chapter2 ; \n"+"import java.sql.*;\n"+
-            "// PROGRAM $$PROGRAMNAME$$" + "\n" + "class JavaOutput \n{\n" +
+    static String header = "package chapter2; \n"+"import java.sql.*;\n"+
+            "// PROGRAM PROGRAMNAME" + "\n" + "class JavaOutput \n{\n" +
             //"Connection gTheDatabaseConnection = null; \n" +
             "   static Connection gTheDatabaseConnection = null; \n" +
             "   static void gConnectTodatabase()\n" +
@@ -33,9 +33,25 @@ public class ProgramStatement extends Statement{
             "           System.exit(0);\n" +
             "       }\n" +
             "       System.out.println(\"database successfully created\");\n" +
-            "   }\n";
+            "   }\n" +
+            "\n" +
+            "static void gDisconnectToDatabase()\n" +
+            "{ \n" +
+            " try \n" +
+            "  { \n" +
+            "   if(gTheDatabaseConnection!=null) gTheDatabaseConnection.close();\n" +
+            "   gTheDatabaseConnection = null; \n" + 
+            "  } catch (Exception e) \n" +
+            "  {\n" +
+            "   System.err.println(\"DISCONNECT\" + e.getClass().getName() + \": \" + e.getMessage() );\n" +
+            "   System.exit(0);\n" +
+            "  }\n" + 
+            "  \n" +
+            "  System.out.println(\"database successfully DISCONNECTED\"); \n" +
+            "}";
+            
     @Override public String toJavaCode()
     {
-        return header.replaceFirst("$$PROGRAMNAME$$", name) + blk.toJavaCode(true) + " \n } // END PROGRAM\n";
+        return header.replaceFirst("PROGRAMNAME", name) + blk.toJavaCode(true) + " \n } // END PROGRAM\n";
     }
 }

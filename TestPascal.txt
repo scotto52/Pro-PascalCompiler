@@ -1,21 +1,6 @@
-PROGRAM HelloWorld ;
-
-TYPE
-	COLOUR = RECORD
-		red:INTEGER;
-		green:INTEGER;
-		blue:INTEGER;
-	END;
+PROGRAM TESTSQLUPDATE ;
 VAR
-	myNumber : real ;        
-	myColor : Colour ;
-
+    X : INTEGER;
 BEGIN
-        With myColor DO
-        BEGIN
-        	red := 34 ;
-        END ;
-        Writeln(myColor.red);
-	myNumber := 45 * 34;
-	Writeln(myNumber);
+    EXEC SQL UPDATE myDatabase SET cop = :x, thing = 23 ;
 END .

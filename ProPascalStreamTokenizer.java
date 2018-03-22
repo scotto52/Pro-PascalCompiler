@@ -24,6 +24,7 @@ public class ProPascalStreamTokenizer extends StreamTokenizer{
         super.slashStarComments(false);
         super.eolIsSignificant(false);
         super.ordinaryChar('/');
+        super.quoteChar('\'');
     }
     
     public String getLastComment()

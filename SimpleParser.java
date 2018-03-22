@@ -78,6 +78,12 @@ class SimpleParser
         {
             throw new PascalParseError("expected a statement here");
         }
+        if("EXEC".equalsIgnoreCase(st.sval))
+        {
+            st.pushBack();
+            s = exeStatement(st);
+            return s;
+        }
         if( "BEGIN".equalsIgnoreCase(st.sval))
         {
             st.pushBack();
@@ -482,8 +488,6 @@ class SimpleParser
               }
               
           }while(token != ':');
-          //token = st.nextToken();
-          System.out.println("Got here and token = " + st.sval);
           TypePart type = parseInLineType(st, block);
           for(VariablePart theVar : px)
           {
@@ -1217,6 +1221,114 @@ class SimpleParser
               throw new PascalParseError("With expected DO." + token);
           }
           // got here so everything OK
+      }
+      
+      public Statement exeStatement(StreamTokenizer st)
+              throws PascalParseError, IOException {
+          
+          expectThisIdentifier(st, "EXEC", "EXEC SQL expected EXEC");
+          expectThisIdentifier(st, "SQL", "EXEC SQL expected '");
+          int token = st.nextToken();
+          SQLStatement s = null;
+          
+          if(token != StreamTokenizer.TT_WORD)
+          {
+              throw new PascalParseError("expectred a command name here in exeStatement");
+          }
+          System.out.println("SQL EXEC" + st.sval);
+          if("COMMIT".equalsIgnoreCase(st.sval)) {
+              expectThisIdentifier(st, "WORK", "EXEC SQL COMMIT expected WORK ");
+              token = st.nextToken();
+              if(token != ';') throw new PascalParseError("Expected ; here");
+              s = new SQLCommitWorkStatement();
+              return s;
+          }
+          if("UPDATE".equalsIgnoreCase(st.sval)) {
+              return parseExeSQLUpdate(st);
+          }
+          throw new PascalParseError("Unknown SQL command " + st.sval);
+      }
+      
+      public SQLStatement parseExeSQLUpdate(StreamTokenizer st)
+              throws PascalParseError, IOException {
+          System.out.println("parseExeSQLUpdate...");
+          int token;
+          token = st.nextToken();
+          if (token != StreamTokenizer.TT_WORD)
+          {
+              throw new PascalParseError("expected a table name here in exe sql update ");
+          }
+          String tableName = new String(st.sval); 
+          expectThisIdentifier(st, "SET", "EXEC SQL UPDATE expected SET");
+          // get columns to set
+          List<SQLUpdateAssignment> updates = new ArrayList<SQLUpdateAssignment>(5);
+          do {
+              SQLUpdateAssignment assignment = sqlSetColumn(st);
+              updates.add(assignment);
+              token = st.nextToken();
+          } while(token == ',');
+          // while will come here
+          // code for ; here
+          SQLUpdateStatement update = new SQLUpdateStatement(tableName, updates);
+          System.out.println("parseExeUpdate list complete");
+          return update;
+      }
+      
+      public SQLUpdateAssignment sqlSetColumn(StreamTokenizer st)
+              throws PascalParseError, IOException {
+          
+          int token = st.nextToken();
+          //Get column name
+          if(token != StreamTokenizer.TT_WORD) {
+            throw new PascalParseError("SQL Update expected a column name here at " + token);
+          }
+          String columnName = new String(st.sval);
+          token = st.nextToken();
+          if(token != '=')
+          {
+              throw new PascalParseError("SQL Update expected a '=' after column name" + token);
+          }
+          token = st.nextToken();
+          if(token != StreamTokenizer.TT_WORD) {
+              if(token == ':') // local variable
+              {
+                  token = st.nextToken();
+                  if(token != StreamTokenizer.TT_WORD) {
+                      throw new PascalParseError("SQL Update expected an identifier after : " + token);
+                  }
+                  System.out.println("LOCAL VARIABLE " + st.sval);
+                  VariablePart varName; // variable name.
+                  varName = new VariablePart(st.sval);
+                  return new SQLUpdateAssignment(columnName, varName);
+              }
+              if(token == '\'') //quoted string 
+              {
+                  System.out.println("LITERAL STRING " + st.sval);
+                  return new SQLUpdateAssignment(columnName, st.sval);
+              }
+          }
+          if(token == StreamTokenizer.TT_NUMBER)
+          {
+              System.out.println("LITERAL NUMBER " + st.nval);
+              return new SQLUpdateAssignment(columnName, SQLUpdateAssignment.kLiteralNumber, st.nval);
+          }
+          if(token == '(') {
+              throw new PascalParseError("Sub selects not implemented");
+          }
+          if("NULL".equalsIgnoreCase(st.sval)) 
+          {
+              System.out.println("NULL value " + st.sval);
+              return new SQLUpdateAssignment(columnName, SQLUpdateAssignment.kNULL);
+          }
+          if(token == StreamTokenizer.TT_EOF) {
+              throw new PascalParseError("SQL Update expected something after = " + token);
+          }
+          if("WHERE".equalsIgnoreCase(st.sval)) {
+          }
+          System.out.println("SOMETHING ELSE " + st.sval);    
+          assert false :"sqlSetColumn unreachable ";
+          // UNREACHABLE
+          return null;
       }
       
 } // END CLASS 
