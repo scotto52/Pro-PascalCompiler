@@ -1,6 +1,13 @@
-PROGRAM TESTSQLUPDATE ;
-VAR
-    X : INTEGER;
-BEGIN
-    EXEC SQL UPDATE myDatabase SET cop = :x, thing = 23 ;
+PROGRAM TESTPROCEDUREDO ;     
+(* - this is a procedure to test if procedures work *)      
+    Procedure isThisworking ;     
+        VAR          
+            localVar : INTEGER ;      
+        BEGIN         
+            localVar := 1 ;          
+            Writeln( localVar ) ;      
+        END  
+BEGIN                   
+    WriteLn(34) ;
+    isThisWorking ; (* Hope this works *)
 END .

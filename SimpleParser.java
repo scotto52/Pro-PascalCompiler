@@ -12,6 +12,7 @@ class SimpleParser
 { 
   HashMap<String,VariablePart> symbolTable = new HashMap<String,VariablePart>();
   HashSet<LabelPart> labelSet = new HashSet<LabelPart>();
+  BlockStatement currentScope = null;
   
   
   //-----------------------------------------------------------------------
@@ -73,10 +74,15 @@ class SimpleParser
             throws PascalParseError,IOException
     {
         int token = st.nextToken();
-        Statement s;
+        Statement s = null;
         if(token != StreamTokenizer.TT_WORD)
         {
             throw new PascalParseError("expected a statement here");
+        }
+        if( "WriteLn".equalsIgnoreCase(st.sval))
+        {
+            st.pushBack();
+            return writelnStatement(st);
         }
         if("EXEC".equalsIgnoreCase(st.sval))
         {
@@ -108,29 +114,37 @@ class SimpleParser
         {
             st.pushBack();
             s = withStatement(st);
-            System.out.println( "Got here mucker" );
-            System.out.println( st.ttype );
-            //token = st.nextToken();
-            //st.pushBack();
-            return s;
+            //System.out.println( st.ttype );
+            //return s;
         }
-        if( "WriteLn".equalsIgnoreCase(st.sval))
+        if(s == null)
         {
-            st.pushBack();
-            return writelnStatement(st);
-        }
+            //handle procedure
+            assert currentScope != null;
+            System.out.println("PARSING " + st.ttype + " " + st.sval);
+            ProcedurePart proc = currentScope.getProcedureFor(st.sval);
+            if(proc != null) {
+                st.pushBack();
+                s = parseProcedureCallStatement(st);
+            }
+            else // handle variable
+            {
         // OK GOT HERE AND IT'S NOT A RESERVED WORD -.
         // should check VARS to see if Var but for now assume OK.
         st.pushBack();
-        System.out.println( st.sval );
-        return assignmentStatement(st);
+        s = assignmentStatement(st);
+            }
+        }
+        ProPascalStreamTokenizer pst = (ProPascalStreamTokenizer) st;
+        assert pst != null;
+        s.stringPascalComment = pst.getLastComment();
+        return s;
     }
     
     public Statement assignmentStatement (StreamTokenizer st)
             throws PascalParseError,IOException
     {
         int token = st.nextToken();
-        System.out.println( st.sval );
         if (token == StreamTokenizer.TT_WORD)
         {
             System.out.println( " VARIABLE " + st.sval);
@@ -248,13 +262,24 @@ class SimpleParser
       //----------------------------------------------------------
       VariablePart makeVariable(String name  )
       {  
-          name = name.toLowerCase(); //PASCAL IS CASE SENSITIVE
-         VariablePart var = symbolTable.get( name ) ; 
+         name = name.toLowerCase(); //PASCAL IS CASE SENSITIVE
+         VariablePart var = null;
+         if(currentScope != null) {
+             var = currentScope.getVarForName(name);
+             if(var == null)
+             {
+                 var = new VariablePart(name);
+             }
+             currentScope.addVariable(var);
+             return var;
+         } else {
+        var = symbolTable.get( name ) ; 
         if( var  == null  ) 
         {  // NOT FOUND MAKE A NEW ONE
            var =  new VariablePart( name );
            symbolTable.put( name , var ) ; 
         } 
+         }
         return var  ;
       } 
       //----------------------------------------------------------
@@ -273,6 +298,7 @@ class SimpleParser
        
 
       }
+
       public TreePart parseStart(  BufferedReader in4)  throws PascalParseError, IOException 
       { 
         StreamTokenizer st = new ProPascalStreamTokenizer(in4);
@@ -673,6 +699,8 @@ class SimpleParser
               throws PascalParseError,IOException
       {
           BlockStatement block = new BlockStatement(); assert block != null;
+          BlockStatement oldLocalScope = currentScope;
+          currentScope = block;
           int token = st.nextToken();
           System.out.println("parseBlock/READING " + st.sval);
           if(token == '[') token = parseCompilerHint(st, block);
@@ -702,15 +730,17 @@ class SimpleParser
               parseVars(st, block);
               token = st.nextToken();
           }
-          if ("PROCEDURE".equalsIgnoreCase(st.sval) == true){
-              parseProcedure(st);
-              token = st.nextToken();
-          }
           //[1] PARSE BLOCK
-          if(token == '[') token = parseCompilerHint(st, block);
+          
           if(token != StreamTokenizer.TT_WORD)
           {
-              throw new PascalParseError("expected a BEGIN here at this block got " + st.sval);
+              throw new PascalParseError("expected a BEGIN/PROCEDURE here at this block got " + st.sval);
+          }
+          if( "PROCEDURE".equalsIgnoreCase(st.sval)== true)// can be more than one         
+          {              
+              st.pushBack(); // put 'procedure back on stream.
+              ProcedurePart p = parseProcedure(st);
+              token = st.nextToken();
           }
           if("BEGIN".equalsIgnoreCase(st.sval) == false)
           {
@@ -738,6 +768,8 @@ class SimpleParser
               st.pushBack();
           }
       }while(keepGoing == true);
+          currentScope = oldLocalScope; //Restore outer scope all local vars are forgotten.
+      System.out.println("Block ended");
       return block;
       }
       
@@ -1124,18 +1156,12 @@ class SimpleParser
           gCUrrentWithStatement = w;
           expectThisIdentifier(st, "DO", "With-expected DO '");
           Statement s = allStatements(st);
-          System.out.println( "Got here pal" );
-          System.out.println( st.sval );
           int token = st.nextToken();
-          System.out.println( token );
           if(token != ';') {
               throw new PascalParseError("With expected ';' at end got " + st.sval);
           }
-          System.out.println( "Got here mate" );
           gCUrrentWithStatement = old;
-          System.out.println( "Got here dude" );
           w.setStatements(s);
-          System.out.println( token );
           return w; 
       }
       
@@ -1182,31 +1208,45 @@ class SimpleParser
           
       }
       
-      public Statement parseProcedure (StreamTokenizer st)
+      public ProcedurePart parseProcedure (StreamTokenizer st)
               throws PascalParseError,IOException {
           //Procedure Statement
+          this.expectThisIdentifier(st, "PROCEDURE", "Procedures must begin with PROCEDURE");
+          ProcedurePart pro = new ProcedurePart();
           int token = st.nextToken();
-          /*if(token == '[') token = parseCompilerHint(st, null);
-          if(token != StreamTokenizer.TT_WORD){
-              throw new PascalParseError("Procedures begin with PROCEDURE");
-          }
-          if("PROCEDURE".equalsIgnoreCase(st.sval)== false) {
-              throw new PascalParseError("Procedures must begin with PROCEDURE got " + st.sval);
-          }
-          token = st.nextToken();*/
           if(token != StreamTokenizer.TT_WORD) {
               throw new PascalParseError("Procedures begin with PROCEDURE <IDENTIFIER>");
           }
-          String procedureName = new String(st.sval);
+          String procedureName = st.sval;
+          pro.setProcedureName(procedureName);
           System.out.println("Procedure is " + procedureName);
           token = st.nextToken(); //Get ;
           if(token != ';'){
               throw new PascalParseError("Expected <IDENTIFIER>; ...");
           }
-          Statement s = parseBlock(st); //Get block
-          ProcedurePart proc = new ProcedurePart (procedureName, s);
+          BlockStatement block = parseBlock(st); //Get block
+          pro.setMyBlock(block);
           System.out.println(" Finished Procedure ");
-          return proc;
+          return pro;
+      }
+      
+      public ProcedureCallStatement parseProcedureCallStatement(StreamTokenizer st)
+              throws PascalParseError, IOException {
+          
+          int token = st.nextToken();
+          if(token != st.TT_WORD) {
+              throw new PascalParseError("Internal compiler problem - Contact your System Administrator");
+          }
+          ProcedurePart proc = currentScope.getProcedureFor((st.sval).toLowerCase());
+          if(proc == null) {
+              throw new PascalParseError("Unrecognised Procedure Name " + st.sval);
+          }
+          ProcedureCallStatement pcs = new ProcedureCallStatement(proc);
+          token = st.nextToken();
+          if(token != ';') {
+              throw new PascalParseError("Expected ';' at end of Procedure Call got " + token);
+          }
+          return pcs;
       }
       
       //Simple utility function
@@ -1246,6 +1286,9 @@ class SimpleParser
           if("UPDATE".equalsIgnoreCase(st.sval)) {
               return parseExeSQLUpdate(st);
           }
+          if("DO".equalsIgnoreCase(st.sval)) {
+              return parseExeSQLDo(st);
+          }
           throw new PascalParseError("Unknown SQL command " + st.sval);
       }
       
@@ -1267,9 +1310,31 @@ class SimpleParser
               updates.add(assignment);
               token = st.nextToken();
           } while(token == ',');
-          // while will come here
-          // code for ; here
+
+          System.out.println("END OF UPDATE LIST " + updates.size());
+          SQLWhereStatement where = null;
+          if(token == StreamTokenizer.TT_WORD) {
+              if("WHERE".equalsIgnoreCase(st.sval)) {
+                  System.out.println("PARSE WHERE");
+                  st.pushBack();
+                  where = sqlWhere(st);
+                  token = st.nextToken();
+                  System.out.println("END PARSE WHERE");
+              } else {
+                  throw new PascalParseError("Expecting a where here got " + st.sval);
+              }
+          }
+          if(token != ';') {
+              System.out.println("GOT " + token + " " + (char)token);
+              if(token == st.TT_WORD) {
+                  System.out.println("GOT " + st.sval);
+                  throw new PascalParseError("expected ; at end of update");
+              }
+          }
           SQLUpdateStatement update = new SQLUpdateStatement(tableName, updates);
+          if(where != null) {
+              update.setWhereStatement(where);
+          }
           System.out.println("parseExeUpdate list complete");
           return update;
       }
@@ -1329,6 +1394,84 @@ class SimpleParser
           assert false :"sqlSetColumn unreachable ";
           // UNREACHABLE
           return null;
+      }
+      
+      public SQLStatement parseExeSQLDo(StreamTokenizer st)
+              throws PascalParseError, IOException {
+          System.out.println("parseExeSQLDo...");
+          int token;
+          token = st.nextToken();
+          if (token == '\'')// quoted string
+          {
+              System.out.println("LITERAL STRING on DO Statement " + st.sval);
+              String forDo = st.sval;
+              token = st.nextToken();
+              if(token != ';') {
+                  throw new PascalParseError("Writeln missing semi colon ';' ");
+              }
+              return new SQLStatementDo(forDo);
+          }
+          else {
+              System.out.println("EXEC SQL DO NOT FOUND QUOTE ");
+              throw new PascalParseError("SQL DO");
+          }
+      }
+      
+      public SQLWhereStatement sqlWhere(StreamTokenizer st)
+              throws PascalParseError, IOException {
+          
+          expectThisIdentifier(st, "WHERE", "Expected where at this point");
+          SQLWhereCondition assignment = sqlSetWhereExpression(st);
+          
+          SQLWhereStatement where = new SQLWhereStatement(assignment);
+          return where;
+      }
+      
+      public SQLWhereCondition sqlSetWhereExpression(StreamTokenizer st)
+              throws PascalParseError, IOException {
+          
+          int token = st.nextToken();
+          if(token != StreamTokenizer.TT_WORD) {
+              throw new PascalParseError("SQL WHERE expected a column name here at " + token);
+          }
+          String columnName = new String(st.sval);
+          token = st.nextToken();
+          
+          if(token != '=') {
+              throw new PascalParseError("SQL WHERE expected an '=' after column name" + token);
+          }
+          token = st.nextToken();
+          if(token != StreamTokenizer.TT_WORD) {
+              if(token == ':') { //local variable
+                  token = st.nextToken();
+                  if(token != StreamTokenizer.TT_WORD) {
+                      throw new PascalParseError("SQL WHERE expected an identifier after : " + token);
+                  }
+                  VariablePart varName = null;
+                  varName = new VariablePart(st.sval);
+                  return new SQLWhereCondition(columnName, varName);
+              }
+              if(token == '\'') { //quoted string
+                  System.out.println(" WHERE LITERAL STRING " + st.sval);
+                  return new SQLWhereCondition( columnName, st.sval);
+              }
+              if(token == StreamTokenizer.TT_NUMBER) {
+                  System.out.println(" WHERE IS LITERAL");
+                  return new SQLWhereCondition(columnName, SQLUpdateAssignment.kLiteralNumber, st.nval);
+              }
+              if(token == '(') {
+                  throw new PascalParseError("Sub selectes not implemented");
+              }
+              if(token == ';') {
+                  st.pushBack();
+                  return null;
+              } 
+              throw new PascalParseError("SQL Where expected something after = " + token);
+          }    
+          if("NULL".equalsIgnoreCase(st.sval)) {
+              return new SQLWhereCondition(columnName, SQLUpdateAssignment.kNULL);
+          }
+          throw new PascalParseError("SQL Where expected something after = " + token);
       }
       
 } // END CLASS 

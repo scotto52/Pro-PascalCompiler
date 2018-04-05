@@ -18,12 +18,11 @@ import java.util.*;
 public class BlockStatement extends Statement
 {
     HashSet<LabelPart> blockLabelSet = new HashSet<LabelPart>();
-    // The block constant table has all the constants declared in the block
     Map<String,VariablePart> blockSymbolTable = new HashMap<>();
     ArrayList<Statement> mySteps;
     Map<String,TypePart> typeSymbolTable = new HashMap<>();
-    // The block symbol table has all the variables declared in the block
     BlockStatement parentBlock;
+    Map<String,ProcedurePart> procSymbolTable = new HashMap<>();
     
     public BlockStatement()
     {
@@ -42,13 +41,14 @@ public class BlockStatement extends Statement
     {
         StringBuffer b = new StringBuffer(" \n");
         // NOW PUT LABELS HERE
-        if(!this.blockLabelSet.isEmpty()) {
-        b.append("// LABELS \n");
-        }
-        for (LabelPart temp : blockLabelSet)
+        if(!this.blockLabelSet.isEmpty()) 
         {
-            b.append(temp.toJavaCode());
-            b.append('\n');
+            b.append("// LABELS \n");
+            for (LabelPart temp : blockLabelSet)
+            {
+                b.append(temp.toJavaCode());
+                b.append('\n');
+            }
         }
         if(!this.typeSymbolTable.isEmpty())
         {
@@ -57,6 +57,14 @@ public class BlockStatement extends Statement
             {
                 TypePart t = this.typeSymbolTable.get(tname);
                 b.append(t.toJavaCode());
+            }
+        }
+        if(! procSymbolTable.isEmpty())
+        {
+            b.append(("//PROCEDURES  \n"));
+            for(ProcedurePart proc : procSymbolTable.values()) 
+            {
+                b.append(proc.toJavaCode());
             }
         }
         if(isTop)
@@ -103,6 +111,15 @@ public class BlockStatement extends Statement
         return result;
     }
     
+    public VariablePart getVarForName(String name) {
+        if(parentBlock != null) //try parent first
+        {
+            VariablePart it = parentBlock.getVarForName(name);
+            if(it != null)return it;
+        }
+        return blockSymbolTable.get(name);
+    }
+    
     public boolean addLabel(LabelPart it) {
         boolean result = true;
         LabelPart lab = it;
@@ -131,18 +148,14 @@ public class BlockStatement extends Statement
     public TypePart getType (String name) {
        return typeSymbolTable.get(name.toLowerCase());
     }
-    
-    /*public boolean addConstant(ConstantPart it)
-    {
-        boolean result = true;
-        ConstantPart already = blockConstantTable.get(it.getConstantName());
-        if (already !=null)
-        {
-            result = false;
-            System.out.println("WARNING DUPLICATE CONSTANT NAME " + it.getConstantName());
+        
+    public ProcedurePart getProcedureFor(String name) {
+        name = name.toLowerCase();
+        System.out.println("SR" + name);
+        ProcedurePart proc = procSymbolTable.get(name);
+        if(proc == null && parentBlock != null) {
+            proc = parentBlock.getProcedureFor(name);
         }
-        blockConstantTable.put(it.getConstantName(), it );
-        return result;
-    }*/
-    
+        return proc;
+    }    
 }

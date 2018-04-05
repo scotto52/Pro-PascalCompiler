@@ -1,7 +1,7 @@
 // GENERATED CODE 
 package chapter2; 
 import java.sql.*;
-// PROGRAM TESTSQLUPDATE
+// PROGRAM TESTPROCEDUREDO
 class JavaOutput 
 {
    static Connection gTheDatabaseConnection = null; 
@@ -36,24 +36,8 @@ static void gDisconnectToDatabase()
 public static void main(String[] args) 
 {
  gConnectTodatabase();
-// VARS 
-int x  = 0 ;
-
-// END VARS 
 // BEGIN CODE
-
- //SQL UPDATE 
- assert gTheDatabaseConnection != null ; 
- try 
- { 
-  String sqlInject = "Update myDatabase SET cop = " + x + " , thing = 23.0" ; 
-  Statement stmt = gTheDatabaseConnection.createStatement();
-  stmt.executeUpdate(sqlInject);
-  stmt.close();
- } catch(SQLException e)
- {
-  System.out.println(e.getMessage());
- }
+System.out.println(23.0);/* WriteLn */ 
 gDisconnectToDatabase();
 } // END BLOCK 
  

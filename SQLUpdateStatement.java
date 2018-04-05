@@ -16,13 +16,18 @@ public class SQLUpdateStatement extends SQLStatement {
     
     List<SQLUpdateAssignment> updates = new ArrayList<SQLUpdateAssignment>(5);
     String tableName;
-    SQLStatement whereStatement;
+    protected SQLStatement whereStatement = null;
     
     public SQLUpdateStatement(String tableName, List<SQLUpdateAssignment> theAssignments) {
         super();
         assert theAssignments != null;
         this.tableName = tableName;
         updates = theAssignments;
+    }
+    
+    public void setWhereStatement(SQLStatement whereStatement) {
+        
+        this.whereStatement = whereStatement;
     }
     
     @Override public String toJavaCode() {
@@ -35,7 +40,12 @@ public class SQLUpdateStatement extends SQLStatement {
             }
             allAssignments = allAssignments + it.toJavaString();
         }
-        sql = sql + allAssignments + "\"";
+        sql = sql + allAssignments;
+        if(whereStatement != null) {
+            System.out.println("Using where ->" + whereStatement.toJavaCode());
+            sql = sql + whereStatement.toJavaCode();
+        }
+        sql = sql + "\"";
         String s = "\n //SQL UPDATE \n" +
                 " assert gTheDatabaseConnection != null ; \n" + 
                 " try \n" + 
