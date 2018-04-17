@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package chapter2;
+package propascal.transcompiler;
 
 /**
  *
@@ -17,7 +17,7 @@ public class ProgramStatement extends Statement{
         this.name = called;
         this.blk = block;
     }
-    static String header = "package chapter2; \n"+"import java.sql.*;\n"+
+    static String header = "package propascal.transcompiler; \n"+"import java.sql.*;\n"+
             "// PROGRAM PROGRAMNAME" + "\n" + "class JavaOutput \n{\n" +
             //"Connection gTheDatabaseConnection = null; \n" +
             "   static Connection gTheDatabaseConnection = null; \n" +
@@ -55,3 +55,4 @@ public class ProgramStatement extends Statement{
         return header.replaceFirst("PROGRAMNAME", name) + blk.toJavaCode(true) + " \n } // END PROGRAM\n";
     }
 }
+

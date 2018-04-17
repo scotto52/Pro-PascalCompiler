@@ -3,7 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package chapter2;
+package propascal.transcompiler;
+
+/**
+ *
+ * @author Robertson
+ */
+
 import java.io.*;
 import java.util.*;
 
@@ -1221,12 +1227,26 @@ class SimpleParser
           pro.setProcedureName(procedureName);
           System.out.println("Procedure is " + procedureName);
           token = st.nextToken(); //Get ;
+          ArrayList<VariablePart> thevars = null;
+          if(token == '(') // parse parameters
+          {
+              System.out.println("PARSING PROCEDURE PARAMETERS");
+              thevars = readVars(st);
+              token = st.nextToken();
+              if(token != ')')
+              {
+                  throw new PascalParseError("Expected a ')' to end parameters ");
+              }
+              pro.setTheVars(thevars);
+          }
+          token = st.nextToken();
           if(token != ';'){
-              throw new PascalParseError("Expected <IDENTIFIER>; ...");
+              throw new PascalParseError("Expected a ';' to end procedure header ... " + token);
           }
           BlockStatement block = parseBlock(st); //Get block
           pro.setMyBlock(block);
           System.out.println(" Finished Procedure ");
+          currentScope.add(pro);
           return pro;
       }
       
@@ -1237,14 +1257,27 @@ class SimpleParser
           if(token != st.TT_WORD) {
               throw new PascalParseError("Internal compiler problem - Contact your System Administrator");
           }
-          ProcedurePart proc = currentScope.getProcedureFor((st.sval).toLowerCase());
+          ProcedurePart proc = currentScope.getProcedureFor((st.sval));
           if(proc == null) {
               throw new PascalParseError("Unrecognised Procedure Name " + st.sval);
           }
           ProcedureCallStatement pcs = new ProcedureCallStatement(proc);
           token = st.nextToken();
+          //check for parameters
+          if(token == '(') {
+              do {
+                  TreePart express = booleanGroupExpression(st);
+                  pcs.addParameter(express);
+                  System.out.println("Adding Parameter");
+                  token = st.nextToken();
+              } while(token == ',');
+              if (token != ')') {
+                  throw new PascalParseError("Expected a ')' at the end of parameters in procedure");
+              }
+          }
+          //token = st.nextToken();
           if(token != ';') {
-              throw new PascalParseError("Expected ';' at end of Procedure Call got " + token);
+              throw new PascalParseError("Expected ';' at end of Procedure Call got " + st.sval);
           }
           return pcs;
       }
@@ -1474,6 +1507,39 @@ class SimpleParser
           throw new PascalParseError("SQL Where expected something after = " + token);
       }
       
+      public ArrayList<VariablePart> readVars(StreamTokenizer st) 
+          throws PascalParseError, IOException {
+          
+          ArrayList<VariablePart> theVars = new ArrayList<>();
+          
+          int token;
+          token = st.nextToken();
+          while(token != ')'){
+              if (token != StreamTokenizer.TT_WORD) {
+                  throw new PascalParseError("EXPECTED Variable name here");
+              }
+              System.out.println("PARSING " + st.sval);
+              VariablePart var = new VariablePart(st.sval);
+              token = st.nextToken();
+              if(token != ':') {
+                  throw new PascalParseError("EXPECTED : here");
+              }
+              TypePart type = parseInLineType(st, this.currentScope);
+              var.setType(type);
+              theVars.add(var);
+              token = st.nextToken();
+              if(! (token == ')' || token == ','))
+              {
+                  throw new PascalParseError(" ) or a , for a new var here " + (char)token);
+              }
+              if(token == ',') token = st.nextToken();
+          }
+          assert token == ')';
+          
+          st.pushBack();
+          return theVars;
+      }
 } // END CLASS 
  
+
 

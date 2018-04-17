@@ -3,8 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package chapter2;
+package propascal.transcompiler;
 
+/**
+ *
+ * @author Robertson
+ */
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.EOFException;
@@ -29,14 +33,14 @@ public class pascalCompiler {
         try 
     {
       BufferedReader in4;
-      in4 = new BufferedReader(new FileReader("C:/Users/Robertson/Documents/NetBeansProjects/Chapter6/src/chapter2/TestPascal.txt"));
+      in4 = new BufferedReader(new FileReader("C:/Users/Robertson/Documents/NetBeansProjects/ProPascal TransCompiler/src/propascal/transcompiler/TestPascal.txt"));
       
       SimpleParser myParser = new SimpleParser(); 
       assert myParser != null ; 
       String javacodeString = myParser.expressionToJava(in4);
       System.out.println("PARSE OK //------\n" + "\n/------");
       writer = new BufferedWriter(
-                    new FileWriter("C:/Users/Robertson/Documents/NetBeansProjects/Chapter6/src/chapter2/JavaOutput.java"));
+                    new FileWriter("C:/Users/Robertson/Documents/NetBeansProjects/ProPascal Transcompiler/src/propascal/transcompiler/JavaOutput.java"));
       writer.write(javacodeString);
       System.out.println("FILE SAVED OK");
      } 

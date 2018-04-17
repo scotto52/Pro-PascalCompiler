@@ -1,6 +1,6 @@
 PROGRAM TESTPROCEDUREDO ;     
 (* - this is a procedure to test if procedures work *)      
-    Procedure isThisworking ;     
+    Procedure isThisworking (Counter :INTEGER, Thing : REAL);     
         VAR          
             localVar : INTEGER ;      
         BEGIN         
@@ -9,5 +9,6 @@ PROGRAM TESTPROCEDUREDO ;
         END  
 BEGIN                   
     WriteLn(34) ;
-    isThisWorking ; (* Hope this works *)
+    isThisworking ; 
+    (* Hope this works *)
 END .

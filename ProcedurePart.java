@@ -3,16 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package chapter2;
+package propascal.transcompiler;
 
 /**
  *
  * @author Robertson
  */
+import java.util.ArrayList;
+
 public class ProcedurePart extends Statement {
     
     protected String procedureName;
     protected BlockStatement myBlock;
+    protected ArrayList<VariablePart> theVars = null;
     
     public ProcedurePart () {
         super();
@@ -34,13 +37,18 @@ public class ProcedurePart extends Statement {
         this.myBlock = myBlock;
     }
     
+    public void setTheVars(ArrayList<VariablePart> theVars) {
+        this.theVars = theVars;
+    }
+    
     @Override public String toJavaCode() {
         assert procedureName != null;
-        assert myBlock != null : "myBlock mull blocks not allowed";
-        String code = "\n //PROCEDURE \n";
-        code = code + super.toJavaCode() + "\n";
-        code = code + "public static void " + procedureName + "()";
+        assert myBlock != null : "myBlock null blocks not allowed";
+        String  code = super.toJavaCode() + "\n";          
+        code = code + "//------------------------------------------------------";         
+        code = code + "\n public static void "  + procedureName + "()";
         code = code + myBlock.toJavaCode() + "// END PROCEDURE " + procedureName + "\n";
         return  code ;
     }
 }
+

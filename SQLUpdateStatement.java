@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package chapter2;
-
-import java.util.ArrayList;
-import java.util.List;
+package propascal.transcompiler;
 
 /**
  *
  * @author Robertson
  */
+import java.util.ArrayList;
+import java.util.List;
+
 public class SQLUpdateStatement extends SQLStatement {
     
     List<SQLUpdateAssignment> updates = new ArrayList<SQLUpdateAssignment>(5);
@@ -61,3 +61,4 @@ public class SQLUpdateStatement extends SQLStatement {
         return s;
     }
 }
+

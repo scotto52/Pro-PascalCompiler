@@ -1,10 +1,9 @@
-
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package chapter2;
+package propascal.transcompiler;
 
 /**
  *
@@ -59,14 +58,14 @@ public class BlockStatement extends Statement
                 b.append(t.toJavaCode());
             }
         }
-        if(! procSymbolTable.isEmpty())
-        {
-            b.append(("//PROCEDURES  \n"));
-            for(ProcedurePart proc : procSymbolTable.values()) 
+        if(! procSymbolTable.isEmpty()) b.append(("\n/*  ******PROCEDURES ****** */\n"));
+        
+        for(ProcedurePart proc : procSymbolTable.values()) 
             {
                 b.append(proc.toJavaCode());
             }
-        }
+        if(! procSymbolTable.isEmpty() )                                  
+           b.append(("\n/*   ****** END  PROCEDURES  ******  */\n"));
         if(isTop)
             b.append("public static void main(String[] args) \n{\n gConnectTodatabase();\n");
         else
@@ -148,10 +147,13 @@ public class BlockStatement extends Statement
     public TypePart getType (String name) {
        return typeSymbolTable.get(name.toLowerCase());
     }
+    
+    public void add (ProcedurePart it) {
+        procSymbolTable.put(it.getProcedureName(), it);
+    }
         
     public ProcedurePart getProcedureFor(String name) {
-        name = name.toLowerCase();
-        System.out.println("SR" + name);
+        //name = name.toLowerCase();
         ProcedurePart proc = procSymbolTable.get(name);
         if(proc == null && parentBlock != null) {
             proc = parentBlock.getProcedureFor(name);
@@ -159,3 +161,4 @@ public class BlockStatement extends Statement
         return proc;
     }    
 }
+
