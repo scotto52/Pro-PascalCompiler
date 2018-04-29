@@ -764,7 +764,7 @@ class SimpleParser
           token = st.nextToken();
           if (token != StreamTokenizer.TT_WORD)
           {
-              throw new PascalParseError("expected an END here at this block");
+              throw new PascalParseError("expected an END here at this block. Got " + st.sval);
           }
           if ("END".equalsIgnoreCase(st.sval)== true)
           {
@@ -1241,7 +1241,7 @@ class SimpleParser
           }
           token = st.nextToken();
           if(token != ';'){
-              throw new PascalParseError("Expected a ';' to end procedure header ... " + token);
+              throw new PascalParseError("Expected a ';' to end procedure header ... " + st.sval);
           }
           BlockStatement block = parseBlock(st); //Get block
           pro.setMyBlock(block);

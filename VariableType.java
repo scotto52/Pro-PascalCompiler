@@ -17,7 +17,7 @@ public enum VariableType {
         "INTEGER",
         "REAL",
         "STRING",
-        "CHARACTER",
+        "CHAR",
         "BOOLEAN",
         "ERROR"
     };

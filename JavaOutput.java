@@ -1,7 +1,7 @@
 // GENERATED CODE 
 package propascal.transcompiler; 
 import java.sql.*;
-// PROGRAM TESTPROCEDUREDO
+// PROGRAM EXAMPLE4
 class JavaOutput 
 {
    static Connection gTheDatabaseConnection = null; 
@@ -33,32 +33,44 @@ static void gDisconnectToDatabase()
   
   System.out.println("database successfully DISCONNECTED"); 
 } 
-
-/*  ******PROCEDURES ****** */
-
-//------------------------------------------------------
- public static void isThisworking() 
-{
- // BLOCK BEGINING // VARS 
-int localvar  = 0 ;
-
-// END VARS 
-// BEGIN CODE
-localvar = 1.0;//ASSIGNMENT 
-
-System.out.println(localvar);/* WriteLn */ 
-} // END BLOCK 
-// END PROCEDURE isThisworking
-
-/*   ****** END  PROCEDURES  ******  */
 public static void main(String[] args) 
 {
  gConnectTodatabase();
+// VARS 
+int thiny  = 0 ;
+
+// END VARS 
 // BEGIN CODE
-System.out.println(34.0);/* WriteLn */ 
+try {Statement stmt = gTheDatabaseConnection.createStatement();
+ stmt.executeUpdate("CREATE TABLE KEITH  (WORKING INTEGER , KEEPIT REAL) "); // DO STATEMEMT
+ stmt.close();} catch(SQLException e) {
+ System.out.println(e.getMessage());
+}
 
-isThisworking(); // pascal procedure 
 
+ //SQL UPDATE 
+ assert gTheDatabaseConnection != null ; 
+ try 
+ { 
+  String sqlInject = "Update KEITH SET WORKING = 1.0 WHERE ID = " + thiny + "" ; 
+  Statement stmt = gTheDatabaseConnection.createStatement();
+  stmt.executeUpdate(sqlInject);
+  stmt.close();
+ } catch(SQLException e)
+ {
+  System.out.println(e.getMessage());
+ }
+
+//SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
+try 
+ {
+   gTheDatabaseConnection.commit();
+ } catch(SQLException e)
+ {
+   System.out.println(e.getMessage());
+ }
+
+System.out.println(23.0);/* WriteLn */ 
 gDisconnectToDatabase();
 } // END BLOCK 
  

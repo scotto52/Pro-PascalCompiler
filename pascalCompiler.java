@@ -33,7 +33,7 @@ public class pascalCompiler {
         try 
     {
       BufferedReader in4;
-      in4 = new BufferedReader(new FileReader("C:/Users/Robertson/Documents/NetBeansProjects/ProPascal TransCompiler/src/propascal/transcompiler/TestPascal.txt"));
+      in4 = new BufferedReader(new FileReader("C:/Users/Robertson/Documents/NetBeansProjects/ProPascal TransCompiler/src/propascal/transcompiler/EXAMPLE4.PPA"));
       
       SimpleParser myParser = new SimpleParser(); 
       assert myParser != null ; 

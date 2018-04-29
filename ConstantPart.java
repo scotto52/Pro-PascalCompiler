@@ -26,7 +26,7 @@ public class ConstantPart extends VariablePart {
    } */
    public String getDefinitionString()
    {
-       return "(CONST) " + VariableType.getJavaStringFor(whichPrimativeType) + 
+       return "static " + VariableType.getJavaStringFor(whichPrimativeType) + 
                " " + variablename + " = " + defaultValue + ";\n";
    }
    /** public String getConstantName()

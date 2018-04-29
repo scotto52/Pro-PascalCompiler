@@ -1,0 +1,17 @@
+[INHERIT('SYS$LIBRARY:STARLET')]  
+PROGRAM EXAMPLE1.PPA;  
+[INHERIT('SYS$LIBRARY:STARLET')]  
+CONST
+	Failure = 0;  
+VAR
+	 A :BOOLEAN;
+	 Bigvarname : INTEGER;  
+BEGIN  
+	 Bigvarname := 1 * 2; 
+	 IF 43 > 33 AND 4 > 1 THEN 
+	 	BEGIN  
+	 		Writeln(A * Failure);  
+	 		Writeln(5*7);  
+	 	END  
+	 Writeln(Bigvarname); 
+END . 

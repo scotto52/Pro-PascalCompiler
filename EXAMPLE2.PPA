@@ -1,0 +1,14 @@
+PROGRAM EXAMPLE2.PPA ;     
+(* - this is a procedure to test if procedures work *)      
+    Procedure isThisworking(Counter :INTEGER, Thing : REAL);     
+        VAR          
+            localVar : INTEGER ;      
+        BEGIN         
+            localVar := 1 ;          
+            Writeln( localVar ) ;      
+        END  
+BEGIN                   
+    WriteLn(34) ;
+    isThisworking ; 
+    (* Hope this works *)
+END .

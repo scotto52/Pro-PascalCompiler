@@ -10,7 +10,7 @@ package propascal.transcompiler;
  * @author Robertson
  */
 class NumberLiteral extends  TreePart { 
-  double literal = 0.0 ; 
+  double literal = 0 ; 
   
     public NumberLiteral( double it ) { 
         this. literal = it;

@@ -1,0 +1,31 @@
+[INHERIT('SYS$LIBRARY:STARLET')]         
+PROGRAM Example3 ;       
+[INHERIT('SYS$LIBRARY:STARLET')]        
+CONST        
+	Failure  = 0;        
+	(* THIS IS A COMMENT TEST *)       
+TYPE   
+        String255 = Array[0..255] of INTEGER; 
+	COLOUR = RECORD                       
+			red:INTEGER;        
+			green:INTEGER;               
+			blue:INTEGER; 
+		END;        
+VAR            
+	Bigvarname : Array[0..10] of INTEGER; 
+	A  :BOOLEAN;
+    myColor : COLOUR; 
+BEGIN
+	WITH myColor Do  
+		BEGIN
+			red := 34;  
+		END;
+	Bigvarname[6]  := 1 * 2 +  Bigvarname[ 1+1] ; (* THIS IS A COMMENT AGAIN *) 
+    IF  43 > 33 AND 4 > 1  THEN           
+		BEGIN   
+			Writeln( A  * Failure );        
+			Writeln( 5*7 );           
+		END  
+	Writeln(Bigvarname);
+    Writeln(myColor.red); 
+END . 

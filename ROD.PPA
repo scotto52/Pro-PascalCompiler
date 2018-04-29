@@ -1,0 +1,141 @@
+[INHERIT('SYS$LIBRARY:STARLET')]
+PROGRAM ROD;
+
+LABEL
+ 	ERRLAB;					(* ORACLE error label *)
+
+CONST
+	Failure  = 0;    			(* Link Failure status *)
+	Healthy  = 1;	         		(* Link Healthy status *)
+	LinkHealthy = 3;
+	LinkFailure = 4;
+	NoData = 1403;				(* SQL error code for No Data *)
+	BanMsgLen = 150;			(* Banner mailbox length *)
+
+TYPE
+	ItemList = RECORD
+			BufLen     : REAL;
+			BufAddr    : INTEGER;
+		    	Terminator : INTEGER;
+		    END;
+
+	IoStatus = RECORD
+			IoStat      : REAL;
+			DeviceInfo  : INTEGER;
+		    END;
+
+	QUADWORD = RECORD
+			Lo : INTEGER;
+			Hi : INTEGER;
+		   END;
+
+VAR
+        Debug,
+	Forever			    : BOOLEAN;	
+	EqivName		    : ARRAY[1..5] OF CHAR;
+	LogName                     : CHAR;
+	TrnList                     : ItemList;
+	LinkFault 		    : BOOLEAN;
+	StatBlock		    : IoStatus;
+	BanChan                     : REAL;
+	MessageLength,
+	I, Count, 
+    	LinkStatus	            : INTEGER;
+	SysStatus		    : INTEGER;
+	DelayTime		    : REAL;
+    	SQLLocation	    	    : INTEGER;
+
+	uid	    		    : CHAR;
+	pwd	    		    : CHAR;
+	tubTinNos 	    	    : ARRAY [1..25] OF CHAR;
+	CntnrFUZZ,
+	FUZZTypeE,
+	FUZZTypeW  		    : CHAR;
+	BOBCntnr,
+	BOBNoE,
+	BOBNoW                      : CHAR;
+	TubTinNo		    : CHAR;
+	ElementsMonitored 	    : INTEGER;
+	RSLinkStatus 		    : CHAR;
+	ODate			    : CHAR;           
+
+
+
+PROCEDURE HandleTubsReturned;;
+
+BEGIN
+   IF Debug THEN 
+      WRITELN(78);
+
+    REPEAT
+
+      SQLLocation := 180;	
+
+      IF SQLCA.SQLCODE = NoData	(* No rows returned *)
+      THEN
+				(* So do nothing *)
+      SQLLocation := 179;
+      ELSE
+
+	BEGIN
+	    IF TubTinNo[1] = 1 THEN
+                BEGIN	
+	       
+                EXEC SQL COMMIT WORK;
+
+                END
+            ELSE IF TubTinNo[1] = 2 THEN
+                BEGIN                
+
+                    EXEC SQL COMMIT WORK;
+
+                END
+
+            SQLLocation := 250;	
+
+            IF ElementsMonitored > 0 THEN
+                BEGIN 
+
+                    SQLLocation := 260;	
+
+                    EXEC SQL    UPDATE BRYAN
+                                SET RCKRET = 1
+                                WHERE TubID = :TubTinNo;
+
+                    EXEC SQL COMMIT WORK;
+                END
+            ELSE
+                BEGIN
+
+                    SQLLocation := 280;	
+
+
+                    EXEC SQL	UPDATE BRYAN
+                                SET CS2ENT = NULL
+                                WHERE TubID = :TubTinNo;
+
+                    EXEC SQL COMMIT WORK;
+                 END
+
+	    EXEC SQL COMMIT WORK;
+
+        END	
+
+        EXEC SQL COMMIT WORK;
+
+    UNTIL SQLCA.SQLCODE = NoData;
+END    (* HandleTubsReturned*)
+
+BEGIN    (* Main Program *)
+    HandleTubsReturned;
+    WRITELN (CntnrFUZZ);
+    WRITELN (FUZZTypeE);
+    WRITELN (FUZZTypeW);
+    WRITELN (BOBCntnr);
+    WRITELN (BOBNoE);
+    WRITELN (BOBNoW);
+    WRITELN (TubTinNo);
+    WRITELN (ElementsMonitored);
+    WRITELN (RSLinkStatus);
+    WRITELN (Oate);
+END .
