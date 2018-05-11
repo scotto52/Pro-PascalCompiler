@@ -15,6 +15,7 @@ class VariablePart extends  TreePart
    VariableType whichPrimativeType;
    double defaultValue;
    TypePart whatIsMyType;
+   VariablePart var;
    
    public VariablePart( String theName ) 
      { 
@@ -63,5 +64,11 @@ class VariablePart extends  TreePart
    public void setType(TypePart whichType)
    {
        this.whatIsMyType = whichType;
+   }
+   
+   public String getAsVarString() {
+
+       return VariableType.getJavaStringFor(whichPrimativeType)+
+               " "+ variablename;
    }
  } 

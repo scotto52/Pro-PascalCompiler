@@ -331,7 +331,7 @@ class SimpleParser
           int token = st.nextToken();
           if("BEGIN".equalsIgnoreCase(st.sval)== false)
           {
-              throw new PascalParseError("Block must begin with word BEGIN");
+              throw new PascalParseError("Block must begin with word BEGIN got " + st.sval);
           }
           
           boolean keepGoing = true;
@@ -701,10 +701,10 @@ class SimpleParser
       }
       
           
-      public BlockStatement parseBlock(StreamTokenizer st)
+      public BlockStatement parseBlock(StreamTokenizer st, BlockStatement block)
               throws PascalParseError,IOException
       {
-          BlockStatement block = new BlockStatement(); assert block != null;
+          //BlockStatement block = new BlockStatement(currentScope); assert block != null;
           BlockStatement oldLocalScope = currentScope;
           currentScope = block;
           int token = st.nextToken();
@@ -742,12 +742,14 @@ class SimpleParser
           {
               throw new PascalParseError("expected a BEGIN/PROCEDURE here at this block got " + st.sval);
           }
+          do {
           if( "PROCEDURE".equalsIgnoreCase(st.sval)== true)// can be more than one         
-          {              
+          {         
               st.pushBack(); // put 'procedure back on stream.
-              ProcedurePart p = parseProcedure(st);
+              ProcedurePart p = parseProcedure(st, block);
               token = st.nextToken();
           }
+          }while(st.sval.equalsIgnoreCase("BEGIN") == false);
           if("BEGIN".equalsIgnoreCase(st.sval) == false)
           {
               throw new PascalParseError("Block must begin with word BEGIN ");
@@ -774,9 +776,15 @@ class SimpleParser
               st.pushBack();
           }
       }while(keepGoing == true);
-          currentScope = oldLocalScope; //Restore outer scope all local vars are forgotten.
+      currentScope = oldLocalScope; //Restore outer scope all local vars are forgotten.
       System.out.println("Block ended");
       return block;
+      }
+      
+      public BlockStatement parseBlock(StreamTokenizer st)
+              throws PascalParseError, IOException {
+          BlockStatement block = new BlockStatement(currentScope); assert block != null;
+          return parseBlock(st, block);
       }
       
       public Statement parseProgram(StreamTokenizer st)
@@ -913,9 +921,8 @@ class SimpleParser
                     float = REAL;
                     */
                     // To Do handle set of
-                    // To Do handle
                     // To Do handle file of
-                    // To Do handle pointers via
+                    // To Do handle pointers
           }
           assert false;
           return null;
@@ -934,12 +941,11 @@ class SimpleParser
               {
                   if(token == StreamTokenizer.TT_WORD)
                   {
-                      // To do could check
+                      // To do could check value
                       result = result + " " + st.sval;
                       System.out.println(" & " + st.sval);
                   } // To do handle others
                   token = st.nextToken();
-                  // WARNING COULD RUN OUT IF BADLY CODED
               }while(token != ']');
               
               System.out.println("IGNOREING "+ result);
@@ -1070,8 +1076,8 @@ class SimpleParser
           }
           System.out.println("READ-IN-IF-STATEMENT '"+ st.sval);
           Statement block = allStatements(st);
-          //System.out.println("READ-GOT-THIS-FAR");
           token = st.nextToken();
+          //System.out.println("READ-GOT-THIS-FAR " + st.sval);
           if(token != StreamTokenizer.TT_WORD ||
                   "ELSE".equalsIgnoreCase(st.sval)== false)
           {
@@ -1214,8 +1220,9 @@ class SimpleParser
           
       }
       
-      public ProcedurePart parseProcedure (StreamTokenizer st)
+      public ProcedurePart parseProcedure (StreamTokenizer st, BlockStatement outerBlock)
               throws PascalParseError,IOException {
+          
           //Procedure Statement
           this.expectThisIdentifier(st, "PROCEDURE", "Procedures must begin with PROCEDURE");
           ProcedurePart pro = new ProcedurePart();
@@ -1226,24 +1233,27 @@ class SimpleParser
           String procedureName = st.sval;
           pro.setProcedureName(procedureName);
           System.out.println("Procedure is " + procedureName);
+          BlockStatement block = new BlockStatement(currentScope);
           token = st.nextToken(); //Get ;
           ArrayList<VariablePart> thevars = null;
           if(token == '(') // parse parameters
           {
               System.out.println("PARSING PROCEDURE PARAMETERS");
               thevars = readVars(st);
+              for(VariablePart v :thevars)block.addParameter(v);
               token = st.nextToken();
               if(token != ')')
               {
                   throw new PascalParseError("Expected a ')' to end parameters ");
               }
               pro.setTheVars(thevars);
-          }
+          
           token = st.nextToken();
+      }
           if(token != ';'){
               throw new PascalParseError("Expected a ';' to end procedure header ... " + st.sval);
           }
-          BlockStatement block = parseBlock(st); //Get block
+          block = parseBlock(st, block); //Get block
           pro.setMyBlock(block);
           System.out.println(" Finished Procedure ");
           currentScope.add(pro);
@@ -1274,8 +1284,9 @@ class SimpleParser
               if (token != ')') {
                   throw new PascalParseError("Expected a ')' at the end of parameters in procedure");
               }
+              //st.pushBack();
           }
-          //token = st.nextToken();
+          token = st.nextToken();
           if(token != ';') {
               throw new PascalParseError("Expected ';' at end of Procedure Call got " + st.sval);
           }

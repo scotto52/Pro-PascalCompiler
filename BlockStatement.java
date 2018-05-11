@@ -22,10 +22,19 @@ public class BlockStatement extends Statement
     Map<String,TypePart> typeSymbolTable = new HashMap<>();
     BlockStatement parentBlock;
     Map<String,ProcedurePart> procSymbolTable = new HashMap<>();
+    Set<VariablePart> parameters = new HashSet<VariablePart>();
     
     public BlockStatement()
     {
-        mySteps = new ArrayList<Statement>();
+        super();
+        mySteps = new ArrayList<>();
+        this.parentBlock = null;
+    }
+    public BlockStatement(BlockStatement pBlock) 
+    {
+        super();
+        mySteps = new ArrayList<>();
+        this.parentBlock = pBlock;
     }
     public void add (Statement s)
     {
@@ -58,6 +67,19 @@ public class BlockStatement extends Statement
                 b.append(t.toJavaCode());
             }
         }
+                // NOW PUT VARS HERE
+        if(!blockSymbolTable.isEmpty())
+        {
+            b.append("// VARS \n");
+            for(String var : blockSymbolTable.keySet())
+            {
+                VariablePart t = blockSymbolTable.get(var);
+                if(! parameters.contains(t)) {
+                    b.append(t.getDefinitionString());
+                }
+            }
+            b.append("// END VARS \n");
+        }
         if(! procSymbolTable.isEmpty()) b.append(("\n/*  ******PROCEDURES ****** */\n"));
         
         for(ProcedurePart proc : procSymbolTable.values()) 
@@ -70,18 +92,7 @@ public class BlockStatement extends Statement
             b.append("public static void main(String[] args) \n{\n gConnectTodatabase();\n");
         else
             b.append("{\n // BLOCK BEGINING ");
-        // NOW PUT VARS HERE
-        if(!blockSymbolTable.isEmpty())
-        {
-            b.append("// VARS \n");
-            for(String var : blockSymbolTable.keySet())
-            {
-                VariablePart t = blockSymbolTable.get(var);
-                b.append(t.getDefinitionString());
-                b.append('\n');
-            }
-            b.append("// END VARS \n");
-        }
+
         b.append("// BEGIN CODE\n");
         for (Statement s: mySteps)
         {
@@ -159,6 +170,16 @@ public class BlockStatement extends Statement
             proc = parentBlock.getProcedureFor(name);
         }
         return proc;
-    }    
+    } 
+    
+    public boolean addParameter(VariablePart it) {
+        parameters.add(it);
+        return addVariable(it);
+    }
+    
+    public BlockStatement getParentBlock()
+    {
+        return parentBlock;
+    }
 }
 

@@ -10,7 +10,7 @@ package propascal.transcompiler;
  * @author Robertson
  */
 public enum VariableType {
-    INTEGER, REAL, STRING, CHARACTER, BOOLEAN, ERROR ; //KEY STUFF
+    INTEGER, REAL, STRING, CHAR, BOOLEAN, ERROR ; //KEY STUFF
     
     private static String builtInTokens[] =
     {

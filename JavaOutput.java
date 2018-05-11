@@ -33,292 +33,429 @@ static void gDisconnectToDatabase()
   
   System.out.println("database successfully DISCONNECTED"); 
 } 
-// LABELS 
-(LABEL) errlab;
 // TYPES//-------------------------------
  static class  IoStatus 
-{
+ {
   int DeviceInfo;
- double IoStat;
-}; //END OF CLASS 
+  double IoStat;
+ }; //END OF CLASS 
 //-------------------------------
- static class  ItemList 
-{
+ static class  ITEMLIST 
+ {
   double BufLen;
- int Terminator;
- int BufAddr;
-}; //END OF CLASS 
+  int Terminator;
+  int BufAddr;
+ }; //END OF CLASS 
 //-------------------------------
  static class  QUADWORD 
-{
+ {
   int Hi;
- int Lo;
-}; //END OF CLASS 
+  int Lo;
+ }; //END OF CLASS 
+// VARS 
+char rslinkstatus;
+char banchan;
+char bobnow;
+double delaytime;
+int elementsmonitored;
+char cntnrfuzz;
+static int linkfailure = 4;
+char fuzztypee;
+char uid;
+ITEMLIST trnlist  = new ITEMLIST(); //simulate stack allocation ;
+char eqivnamelen;
+int sqllocation;
+char odate;
+char banmsg;
+int sysstatus;
+int sqlcode;
+boolean linkfault;
+char tubtinnos  = new char[24];
+boolean debug;
+char logname;
+static int linkhealthy = 3;
+int count;
+int messagelength;
+char tubtinno;
+char bobnoe;
+static int nodata = 1403;
+char bobcntnr;
+int eqivname  = new int[4];
+static int banmsglen = 150;
+IoStatus statblock  = new IoStatus(); //simulate stack allocation ;
+static int failure = 0;
+static int healthy = 1;
+int linkstatus;
+boolean forever;
+char pwd;
+char fuzztypew;
+// END VARS 
 
 /*  ******PROCEDURES ****** */
 
 //------------------------------------------------------
+ public static void TestLink() 
+{
+ // BLOCK BEGINING // BEGIN CODE
+ if(debug) 
+ { 
+  System.out.println(36);/* WriteLn */  
+ } 
+ if((linkstatus == healthy)) 
+ { 
+ if((rslinkstatus == 37)) 
+ { 
+  banmsg = linkfailure;//ASSIGNMENT 
+  SendBannerMessage(); // pascal procedure 
+  linkstatus = failure;//ASSIGNMENT 
+ } else 
+ { 
+ if((rslinkstatus == 38)) 
+ { 
+  sqllocation = 350;//ASSIGNMENT 
+  //SQL UPDATE 
+  assert gTheDatabaseConnection != null ; 
+  try 
+  { 
+   String sqlInject = "Update KEITH SET LKSTAT = 39.0" ; 
+   Statement stmt = gTheDatabaseConnection.createStatement();
+   stmt.executeUpdate(sqlInject);
+   stmt.close();
+  } catch(SQLException e)
+  {
+   System.out.println(e.getMessage());
+  }
+  //SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
+  try 
+  {
+    gTheDatabaseConnection.commit();
+  } catch(SQLException e)
+  {
+   System.out.println(e.getMessage());
+ }
+ }  
+ } 
+ } else 
+ { 
+  if((linkstatus == failure)) 
+ { 
+ if((rslinkstatus == 40)) 
+ { 
+  banmsg = linkhealthy;//ASSIGNMENT 
+  SendBannerMessage(); // pascal procedure 
+  sqllocation = 370;//ASSIGNMENT 
+  //SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
+ try 
+  {
+    gTheDatabaseConnection.commit();
+  } catch(SQLException e)
+  {
+    System.out.println(e.getMessage());
+  }
+  linkstatus = healthy;//ASSIGNMENT 
+ } 
+ }  
+ } 
+} // END BLOCK 
+// END PROCEDURE TestLink
+
+//------------------------------------------------------
+ public static void TranslateStop()  
+{
+ // BLOCK BEGINING // BEGIN CODE
+ if((debug == 7)) 
+ { 
+  System.out.println(8);/* WriteLn */  
+ } 
+ logname = 9;//ASSIGNMENT
+ 
+ trnlist.buflen = 255; //With ASSIGNMENT
+ trnlist.itemcode = lnmstring; //With ASSIGNMENT
+ trnlist.bufaddr = iaddress; //With ASSIGNMENT
+ trnlist.retlenaddr = iaddress; //With ASSIGNMENT
+ trnlist.terminator = 0; //With ASSIGNMENT
+ 
+ eqivname = 10;//ASSIGNMENT 
+ sysstatus = 11;//ASSIGNMENT 
+ eqivname = 12;//ASSIGNMENT 
+ if((eqivname == 13)) 
+ { 
+  System.out.println(14);/* WriteLn */ 
+ } 
+} // END BLOCK 
+// END PROCEDURE TranslateStop
+
+//------------------------------------------------------
+ public static void TranslateDebug()  
+{
+ // BLOCK BEGINING // BEGIN CODE
+ logname = 1;//ASSIGNMENT
+ 
+ trnlist.buflen = 255; //With ASSIGNMENT
+ trnlist.itemcode = lnmstring; //With ASSIGNMENT
+ trnlist.bufaddr = iaddress; //With ASSIGNMENT
+ trnlist.retlenaddr = iaddress; //With ASSIGNMENT
+ trnlist.terminator = 0; //With ASSIGNMENT
+
+ sysstatus = 2;//ASSIGNMENT 
+ eqivname = 3;//ASSIGNMENT 
+ if((eqivname == 4)) 
+ { 
+  debug = 5;//ASSIGNMENT 
+ } else 
+ { 
+  debug = 6;//ASSIGNMENT 
+ } 
+} // END BLOCK 
+// END PROCEDURE TranslateDebug
+
+//------------------------------------------------------
+ public static void Initialise() 
+{
+ // BLOCK BEGINING // BEGIN CODE
+ if((debug == 0)) 
+ { 
+  System.out.println(21);/* WriteLn */  
+ } 
+ forever = 22;//ASSIGNMENT 
+ delaytime = 2;//ASSIGNMENT 
+ linkstatus = 1;//ASSIGNMENT 
+ sysstatus = 0;//ASSIGNMENT 
+ do {  
+  sysstatus = 23;//ASSIGNMENT 
+  if((sysstatus == 24)) 
+  { 
+   System.out.println(24);/* WriteLn */  
+  } 
+ } 
+ while ((sysstatus == 0)) 
+ delaytime = 300;//ASSIGNMENT 
+} // END BLOCK 
+// END PROCEDURE Initialise
+
+//------------------------------------------------------
+ public static void HandleTubsDue() 
+{
+ // BLOCK BEGINING // BEGIN CODE
+ if(debug) 
+ { 
+  System.out.println(25);/* WriteLn */  
+ } 
+ sqllocation = 10.0;//ASSIGNMENT 
+ do {  
+ sqllocation = 20;//ASSIGNMENT 
+ if((sqlcode == 26)) 
+ { 
+  if((sqlcode == nodata)) 
+ { 
+  banmsg = 2;//ASSIGNMENT 
+  banmsg = tubtinno;//ASSIGNMENT  
+  SendBannerMessage(); // pascal procedure 
+ } else 
+ { 
+  banmsg = 1;//ASSIGNMENT 
+  banmsg = tubtinno;//ASSIGNMENT 
+  SendBannerMessage(); // pascal procedure 
+ } 
+ sqllocation = 30;//ASSIGNMENT 
+ //SQL UPDATE 
+ assert gTheDatabaseConnection != null ; 
+ try 
+ { 
+  String sqlInject = "Update ADAM SET TubID = 23.0 WHERE TubID = " + tubtinno + "" ; 
+  Statement stmt = gTheDatabaseConnection.createStatement();
+  stmt.executeUpdate(sqlInject);
+  stmt.close();
+ } catch(SQLException e)
+ {
+  System.out.println(e.getMessage());
+ }
+ //SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
+ try 
+ {
+   gTheDatabaseConnection.commit();
+ } catch(SQLException e)
+ {
+   System.out.println(e.getMessage());
+ }
+} 
+} 
+ while ((sqlcode == nodata)) 
+} // END BLOCK 
+// END PROCEDURE HandleTubsDue
+
+//------------------------------------------------------
  public static void HandleTubsReturned() 
 {
- // BLOCK BEGINING // VARS 
-int debug = 0.0;
-
-int sqlca.sqlcode = 0.0;
-
-int sqllocation = 0.0;
-
-int elementsmonitored = 0.0;
-
-int tubtinno = 0.0;
-
-int nodata = 0.0;
-
-// END VARS 
-// BEGIN CODE
-if(debug) 
- { 
- System.out.println(78.0);/* WriteLn */  
-} 
-do {  
-{
  // BLOCK BEGINING // BEGIN CODE
-sqllocation = 180.0;//ASSIGNMENT 
-
-if((sqlca.sqlcode == nodata)) 
+ if((logname == 0)) 
  { 
- sqllocation = 179.0;//ASSIGNMENT 
- 
-} else 
+  System.out.println(78);/* WriteLn */ 
+ } 
+ do {  
+ sqllocation = 180;//ASSIGNMENT 
+ if((elementsmonitored == 0)) 
  { 
-  
-{
- // BLOCK BEGINING // BEGIN CODE
-if((tubtinno[ 1.0 ] == 1.0)) 
+  sqllocation = 179;//ASSIGNMENT 
+ } else 
+ {  
+ if((tubtinno[1] == 1)) 
  { 
-  
-{
- // BLOCK BEGINING // BEGIN CODE
-
-//SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
-try 
- {
-   gTheDatabaseConnection.commit();
- } catch(SQLException e)
- {
-   System.out.println(e.getMessage());
- }
-
-} // END BLOCK 
- 
-} else 
- { 
- if((tubtinno[ 1.0 ] == 2.0)) 
- { 
-  
-{
- // BLOCK BEGINING // BEGIN CODE
-
-//SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
-try 
- {
-   gTheDatabaseConnection.commit();
- } catch(SQLException e)
- {
-   System.out.println(e.getMessage());
- }
-
-} // END BLOCK 
- 
-}  
-} 
-sqllocation = 250.0;//ASSIGNMENT 
-
-if((elementsmonitored > 0.0)) 
- { 
-  
-{
- // BLOCK BEGINING // BEGIN CODE
-sqllocation = 260.0;//ASSIGNMENT 
-
-
- //SQL UPDATE 
- assert gTheDatabaseConnection != null ; 
+ //SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
  try 
- { 
-  String sqlInject = "Update BRYAN SET RCKRET = 1.0 WHERE TubID = " + tubtinno + "" ; 
-  Statement stmt = gTheDatabaseConnection.createStatement();
-  stmt.executeUpdate(sqlInject);
-  stmt.close();
- } catch(SQLException e)
- {
-  System.out.println(e.getMessage());
- }
-
-//SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
-try 
  {
    gTheDatabaseConnection.commit();
  } catch(SQLException e)
  {
    System.out.println(e.getMessage());
  }
-
-} // END BLOCK 
- 
-} else 
+ } else 
  { 
-  
-{
- // BLOCK BEGINING // BEGIN CODE
-sqllocation = 280.0;//ASSIGNMENT 
-
-
- //SQL UPDATE 
- assert gTheDatabaseConnection != null ; 
+ if((tubtinno[1] == 2)) 
+ { 
+ //SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
  try 
+ {
+   gTheDatabaseConnection.commit();
+ } catch(SQLException e)
+ {
+   System.out.println(e.getMessage());
+ }
+ }  
+ } 
+ sqllocation = 250;//ASSIGNMENT 
+ if((elementsmonitored > 0)) 
  { 
-  String sqlInject = "Update BRYAN SET CS2ENT = NULL  WHERE TubID = " + tubtinno + "" ; 
-  Statement stmt = gTheDatabaseConnection.createStatement();
-  stmt.executeUpdate(sqlInject);
-  stmt.close();
- } catch(SQLException e)
- {
-  System.out.println(e.getMessage());
- }
-
-//SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
-try 
+  sqllocation = 260;//ASSIGNMENT 
+  //SQL UPDATE 
+  assert gTheDatabaseConnection != null ; 
+  try 
+  { 
+   String sqlInject = "Update BRYAN SET RCKRET = 1.0 WHERE TubID = " + tubtinno + "" ; 
+   Statement stmt = gTheDatabaseConnection.createStatement();
+   stmt.executeUpdate(sqlInject);
+   stmt.close();
+  } catch(SQLException e)
+  {
+   System.out.println(e.getMessage());
+  }
+ //SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
+ try 
  {
    gTheDatabaseConnection.commit();
  } catch(SQLException e)
  {
    System.out.println(e.getMessage());
  }
-
-} // END BLOCK 
- 
-} 
-
-//SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
-try 
- {
-   gTheDatabaseConnection.commit();
- } catch(SQLException e)
- {
+ } else 
+ { 
+  sqllocation = 280;//ASSIGNMENT 
+  //SQL UPDATE 
+  assert gTheDatabaseConnection != null ; 
+  try 
+  { 
+   String sqlInject = "Update BRYAN SET CS2ENT = NULL  WHERE TubID = " + tubtinno + "" ; 
+   Statement stmt = gTheDatabaseConnection.createStatement();
+   stmt.executeUpdate(sqlInject);
+   stmt.close();
+  } catch(SQLException e)
+  {
    System.out.println(e.getMessage());
- }
-
-} // END BLOCK 
- 
-} 
-
-//SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
-try 
- {
+  }
+  //SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
+  try 
+  {
    gTheDatabaseConnection.commit();
- } catch(SQLException e)
- {
+  } catch(SQLException e)
+  {
    System.out.println(e.getMessage());
- }
-
-} // END BLOCK 
-} 
- while ((sqlca.sqlcode == nodata)) 
+  }
+ } 
+ //SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
+  try 
+  {
+   gTheDatabaseConnection.commit();
+  } catch(SQLException e)
+  {
+   System.out.println(e.getMessage());
+  }
+ } 
+  //SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
+  try 
+  {
+   gTheDatabaseConnection.commit();
+  } catch(SQLException e)
+  {
+   System.out.println(e.getMessage());
+  }
+ } 
+ while ((sqlacode == nodata)) 
 
 } // END BLOCK 
 // END PROCEDURE HandleTubsReturned
 
+//------------------------------------------------------
+ public static void AssembleElementDetails(int bobcntnrid) 
+{
+ // BLOCK BEGINING // BEGIN CODE
+ if(debug) 
+ { 
+  System.out.println(27);/* WriteLn */  
+ } 
+ bobcntnr = bobcntnrid;//ASSIGNMENT 
+ sqllocation = 140;//ASSIGNMENT 
+ //SQL UPDATE 
+ assert gTheDatabaseConnection != null ; 
+ try 
+ { 
+  String sqlInject = "Update ERNIE SET COMP = 'Y' WHERE FUZZNO = 30.0" ; 
+  Statement stmt = gTheDatabaseConnection.createStatement();
+  stmt.executeUpdate(sqlInject);
+  stmt.close();
+ } catch(SQLException e)
+ {
+  System.out.println(e.getMessage());
+ }
+ //SQLCommitWorkStatementassert gTheDatabaseConnection != null ; 
+ try 
+ {
+   gTheDatabaseConnection.commit();
+ } catch(SQLException e)
+ {
+   System.out.println(e.getMessage());
+ }
+} // END BLOCK 
+// END PROCEDURE AssembleElementDetails
+
+//------------------------------------------------------
+ public static void SendBannerMessage() 
+{
+ // BLOCK BEGINING // BEGIN CODE
+ if(debug) 
+ { 
+  System.out.println(15);/* WriteLn */  
+ } 
+ sysstatus = 16;//ASSIGNMENT 
+} // END BLOCK 
+// END PROCEDURE SendBannerMessage
+
 /*   ****** END  PROCEDURES  ******  */
 public static void main(String[] args) 
 {
- gConnectTodatabase();
-// VARS 
-char rslinkstatus  = 0 ;
+  gConnectTodatabase();
+  // BEGIN CODE
+  uid = 41;//ASSIGNMENT 
+  pwd = 42;//ASSIGNMENT 
+  Initialise(); // pascal procedure 
+  do {  
+  HandleTubsDue(); // pascal procedure 
+  HandleTubsReturned(); // pascal procedure 
+  TranslateDebug(); // pascal procedure 
+  TranslateStop(); // pascal procedure 
+  TestLink(); // pascal procedure 
+  } 
+  while (forever) 
 
-double banchan  = 0 ;
+  gDisconnectToDatabase();
 
-char bobnow  = 0 ;
-
-double delaytime  = 0 ;
-
-int elementsmonitored  = 0 ;
-
-char cntnrfuzz  = 0 ;
-
-static int linkfailure = 4.0;
-
-char fuzztypee  = 0 ;
-
-char uid  = 0 ;
-
-ItemList trnlist  = new ItemList(); //simulate stack allocation ;
-
-int sqllocation  = 0 ;
-
-char odate  = 0 ;
-
-int sysstatus  = 0 ;
-
-boolean linkfault  = 0 ;
-
-char tubtinnos  = new char[24];
-
-boolean debug  = 0 ;
-
-char logname  = 0 ;
-
-static int linkhealthy = 3.0;
-
-int count  = 0 ;
-
-int messagelength  = 0 ;
-
-int i  = 0 ;
-
-char tubtinno  = 0 ;
-
-char bobnoe  = 0 ;
-
-static int nodata = 1403.0;
-
-char bobcntnr  = 0 ;
-
-int oate = 0.0;
-
-char eqivname  = new char[4];
-
-static int banmsglen = 150.0;
-
-IoStatus statblock  = new IoStatus(); //simulate stack allocation ;
-
-static int failure = 0.0;
-
-static int healthy = 1.0;
-
-int linkstatus  = 0 ;
-
-boolean forever  = 0 ;
-
-char pwd  = 0 ;
-
-char fuzztypew  = 0 ;
-
-// END VARS 
-// BEGIN CODE
-
-HandleTubsReturned(); // pascal procedure 
-
-System.out.println(cntnrfuzz);/* WriteLn */ 
-System.out.println(fuzztypee);/* WriteLn */ 
-System.out.println(fuzztypew);/* WriteLn */ 
-System.out.println(bobcntnr);/* WriteLn */ 
-System.out.println(bobnoe);/* WriteLn */ 
-System.out.println(bobnow);/* WriteLn */ 
-System.out.println(tubtinno);/* WriteLn */ 
-System.out.println(elementsmonitored);/* WriteLn */ 
-System.out.println(rslinkstatus);/* WriteLn */ 
-System.out.println(oate);/* WriteLn */ 
-gDisconnectToDatabase();
-} // END BLOCK 
- 
- } // END PROGRAM
+} // END PROGRAM

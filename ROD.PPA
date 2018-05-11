@@ -1,9 +1,6 @@
 [INHERIT('SYS$LIBRARY:STARLET')]
 PROGRAM ROD;
 
-LABEL
- 	ERRLAB;					(* ORACLE error label *)
-
 CONST
 	Failure  = 0;    			(* Link Failure status *)
 	Healthy  = 1;	         		(* Link Healthy status *)
@@ -13,7 +10,7 @@ CONST
 	BanMsgLen = 150;			(* Banner mailbox length *)
 
 TYPE
-	ItemList = RECORD
+	ITEMLIST = RECORD
 			BufLen     : REAL;
 			BufAddr    : INTEGER;
 		    	Terminator : INTEGER;
@@ -30,20 +27,27 @@ TYPE
 		   END;
 
 VAR
-        Debug,
+
+	Debug,
 	Forever			    : BOOLEAN;	
-	EqivName		    : ARRAY[1..5] OF CHAR;
-	LogName                     : CHAR;
-	TrnList                     : ItemList;
+	EqivNameLen       	    : CHAR;
+	EqivName		    : ARRAY[1..5] OF INTEGER;
+	LogName		    : CHAR;
+	TrnList		    : ITEMLIST;
 	LinkFault 		    : BOOLEAN;
 	StatBlock		    : IoStatus;
-	BanChan                     : REAL;
+	BanChan		    : CHAR;
 	MessageLength,
-	I, Count, 
-    	LinkStatus	            : INTEGER;
+	Count, 
+    	LinkStatus,	            
 	SysStatus		    : INTEGER;
 	DelayTime		    : REAL;
+	BanMsg			    : CHAR;
+        SQLCODE,
     	SQLLocation	    	    : INTEGER;
+
+
+	(* Oracle Variables not implemented - Treat as Pascal for now *)
 
 	uid	    		    : CHAR;
 	pwd	    		    : CHAR;
@@ -53,25 +57,199 @@ VAR
 	FUZZTypeW  		    : CHAR;
 	BOBCntnr,
 	BOBNoE,
-	BOBNoW                      : CHAR;
+	BOBNoW	  	    : CHAR;
 	TubTinNo		    : CHAR;
 	ElementsMonitored 	    : INTEGER;
 	RSLinkStatus 		    : CHAR;
 	ODate			    : CHAR;           
 
+ 
+[EXTERNAL,ASYNCHRONOUS]
+Procedure TranslateDebug;
+
+(* This procedure translates the logical name logname from the system table
+ into a local variable Debug				                     
+      - If debug lines are required a logical name should be set up using  
+        the command $>DEFINE/SYS DEBUGROD TRUE		             *)
+
+BEGIN
+	LogName := 1;        (* SYSTEM LOGICAL FOR DEBUG TEXT *)
+	WITH TrnList DO
+	BEGIN
+		BufLen      := 255;
+		ItemCode    := LNMSTRING;
+		BufAddr     := IADDRESS;
+		RetLenAddr := IADDRESS;
+		Terminator   := 0;
+	END;		
+	SysStatus := 2;
+
+	EqivName := 3;
+
+	IF EqivName = 4 THEN
+	BEGIN
+		Debug := 5;
+	END ELSE
+		Debug := 6;
+END	(* translate debug *)
+
+Procedure TranslateStop;                                 
+
+    (* This procedure translates the logical STOPROD
+     from the system table. If defined as 'TRUE'      
+    the process logs the fact then terminates        *)
+
+BEGIN
+
+    IF Debug = 7 THEN
+        WRITELN (8);
+
+    LogName := 9;
+    WITH TrnList DO
+    BEGIN
+        BufLen      := 255;
+        ItemCode    := LNMSTRING;
+        BufAddr     := IADDRESS;
+        RetLenAddr := IADDRESS;
+        Terminator   := 0;
+    END;        
+
+    EqivName := 10;
+
+    SysStatus := 11;
+
+	EqivName := 12;
+
+    IF EqivName = 13 THEN
+    BEGIN
+        WRITELN(14);
+    END
+
+END    (* TranslateStop *)
+
+Procedure SendBannerMessage;
+
+(* This procedure outputs a message to the Banner process mailbox BANMBX *)
+
+BEGIN
+
+  IF Debug THEN 
+  WRITELN(15);
+
+  (* Send alarm/error message to Banner process for output to operator *)
+
+  SysStatus := 16;
 
 
-PROCEDURE HandleTubsReturned;;
+END	(* SendBannerMessage *)
+
+Procedure Initialise;
+
+(* Assigns channels to Banner mailboxes, initialises vars *)
+
+CONST
+ BanMbx     = 20;
+
+BEGIN
+
+  IF Debug = 0 THEN 
+  WRITELN(21);
+  Forever    := 22;			
+  DelayTime  := 2.0;	
+  LinkStatus := 1;		
+  SysStatus := 0;
+
+
+  REPEAT		
+	SysStatus := 23;
+	IF SysStatus = 24 THEN   
+            WriteLn(24);
+
+  UNTIL SysStatus = 0; 
+
+  DelayTime := 300;		(* Set poll table timer to 5 minutes *)
+
+END	(* Initialise *)
+
+PROCEDURE HandleTubsDue;
+
+(* This procedure tests if there are any Tubs/Tins which are due *)
 
 BEGIN
    IF Debug THEN 
-      WRITELN(78);
+      WRITELN(25);
+
+    SQLLocation := 10;	
+
+	REPEAT
+
+	  SQLLocation := 20;	
+
+	  IF SQLCODE = 26		(* No rows returned so *)
+	  THEN					(* Do nothing *)
+	  BEGIN
+	      (* Test if Tub/Tin in Cmpgn *)
+               IF   SQLCODE = NoData       
+               THEN BEGIN
+                       BanMsg := 2;
+                       BanMsg := TubTinNo;
+                       SendBannerMessage;;
+                    END
+               ELSE BEGIN
+
+
+                       BanMsg := 1; 
+                       BanMsg := TubTinNo;
+                       SendBannerMessage;;
+                    END
+
+		       SQLLocation := 30;	
+                 
+
+                  EXEC SQL UPDATE ADAM
+                  SET TubID = 23
+                  WHERE  TubID = :TubTinNo;
+
+		  EXEC SQL COMMIT WORK;
+
+             END  
+	UNTIL SQLCODE = NoData;
+
+END (* HandleTubsDue *)
+
+PROCEDURE AssembleElementDetails (BOBCntnrId:BOBType);
+
+(* This procedure assembles the Element Details  *)
+
+BEGIN  
+   IF Debug THEN 
+      WRITELN(27);
+
+	BOBCntnr := BOBCntnrId;		(* Assign to SQL variable *)
+
+        SQLLocation := 140;	
+
+        EXEC SQL UPDATE ERNIE
+        SET    COMP = 'Y'
+        WHERE  FUZZNO = 30;
+
+	EXEC SQL COMMIT WORK;
+       
+END      (* AssembleElementDetails *)
+
+PROCEDURE HandleTubsReturned;
+
+BEGIN
+   IF LogName = 0 THEN
+    BEGIN
+      WriteLn(78);
+    END
 
     REPEAT
 
       SQLLocation := 180;	
 
-      IF SQLCA.SQLCODE = NoData	(* No rows returned *)
+      IF ElementsMonitored = 0	(* Nothing has been seen *)
       THEN
 				(* So do nothing *)
       SQLLocation := 179;
@@ -123,19 +301,76 @@ BEGIN
 
         EXEC SQL COMMIT WORK;
 
-    UNTIL SQLCA.SQLCODE = NoData;
+    UNTIL SQLACODE = NoData;
 END    (* HandleTubsReturned*)
 
-BEGIN    (* Main Program *)
-    HandleTubsReturned;
-    WRITELN (CntnrFUZZ);
-    WRITELN (FUZZTypeE);
-    WRITELN (FUZZTypeW);
-    WRITELN (BOBCntnr);
-    WRITELN (BOBNoE);
-    WRITELN (BOBNoW);
-    WRITELN (TubTinNo);
-    WRITELN (ElementsMonitored);
-    WRITELN (RSLinkStatus);
-    WRITELN (Oate);
+PROCEDURE TestLink;
+
+(* This procedure tests the link status *)
+
+BEGIN
+
+	IF Debug THEN 
+	   WRITELN(36);
+
+        IF LinkStatus = Healthy
+        THEN BEGIN
+
+             IF   RSLinkStatus = 37
+             THEN BEGIN
+
+                  BanMsg := LinkFailure;    
+                  SendBannerMessage;;
+            
+                  LinkStatus := Failure;
+                  END
+             ELSE IF RSLinkStatus = 38 (* Link Ok - so reset to down *)
+             THEN BEGIN
+
+                  SQLLocation := 350;	
+
+                  EXEC SQL UPDATE KEITH
+                  SET    LKSTAT = 39;
+		  EXEC SQL COMMIT WORK;
+
+                  END
+
+                  END
+
+        ELSE IF LinkStatus = Failure
+        THEN BEGIN
+
+             IF   RSLinkStatus = 40       
+             THEN BEGIN
+
+                  BanMsg := LinkHealthy;  
+                  SendBannerMessage;;
+
+                  SQLLocation := 370;	
+
+		  EXEC SQL COMMIT WORK;
+
+                  LinkStatus := Healthy;
+                  END
+             END
+
+END      (* TestLink *)
+
+BEGIN		(*   Main Program  *)
+	
+   Uid := 41;
+   Pwd := 42;
+               
+   Initialise;;				(* Assign mailboxes etc *)
+
+   REPEAT
+
+      HandleTubsDue;;			
+      HandleTubsReturned;;		
+      TranslateDebug;;            	
+      TranslateStop;;
+      TestLink;;			
+
+   UNTIL Forever;
+
 END .

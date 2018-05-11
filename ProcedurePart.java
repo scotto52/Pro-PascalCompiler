@@ -46,7 +46,23 @@ public class ProcedurePart extends Statement {
         assert myBlock != null : "myBlock null blocks not allowed";
         String  code = super.toJavaCode() + "\n";          
         code = code + "//------------------------------------------------------";         
-        code = code + "\n public static void "  + procedureName + "()";
+        code = code + "\n public static void "  + procedureName;
+        if(theVars == null||theVars.size()==0) {
+            code = code + "()";
+        } else
+        {
+            code = code + "(";
+            boolean first = true;
+            for(VariablePart v : this.theVars)
+            {
+                if(first == false) {
+                    code = code + ", ";
+                }
+                code = code + v.getAsVarString();
+                first = false;
+            }
+            code = code + ")";
+        }
         code = code + myBlock.toJavaCode() + "// END PROCEDURE " + procedureName + "\n";
         return  code ;
     }

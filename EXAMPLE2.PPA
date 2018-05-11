@@ -6,9 +6,13 @@ PROGRAM EXAMPLE2.PPA ;
         BEGIN         
             localVar := 1 ;          
             Writeln( localVar ) ;      
-        END  
+        END
+    Procedure Bob;
+        BEGIN
+            WriteLn(28);
+        END
 BEGIN                   
     WriteLn(34) ;
-    isThisworking ; 
+    isThisworking(34 , 3 * 3.2) ; 
     (* Hope this works *)
 END .
